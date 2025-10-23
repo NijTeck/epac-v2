@@ -5,8 +5,8 @@
         {
             "pacSelector": "epac-dev",
             "cloud": "AzureCloud",
-            "tenantId": "<YOUR-TENANT-ID>",
-            "deploymentRootScope": "/providers/Microsoft.Management/managementGroups/<YOUR-DEV-MG>",
+            "tenantId": "e1f3e196-aa55-4709-9c55-0e334c0b444f",
+            "deploymentRootScope": "/providers/Microsoft.Management/managementGroups/P4CX-dev",
             "desiredState": {
                 "strategy": "ownedOnly",
                 "keepDfcSecurityAssignments": false,
@@ -18,8 +18,8 @@
         {
             "pacSelector": "tenant",
             "cloud": "AzureCloud",
-            "tenantId": "<YOUR-TENANT-ID>",
-            "deploymentRootScope": "/providers/Microsoft.Management/managementGroups/<YOUR-PROD-MG>",
+            "tenantId": "e1f3e196-aa55-4709-9c55-0e334c0b444f",
+            "deploymentRootScope": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f",
             "desiredState": {
                 "strategy": "full",
                 "keepDfcSecurityAssignments": false,

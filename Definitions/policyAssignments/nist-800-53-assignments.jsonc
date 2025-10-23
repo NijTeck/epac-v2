@@ -25,10 +25,10 @@
             "parameterSelector": "prod",
             "scope": {
                 "epac-dev": [
-                    "/providers/Microsoft.Management/managementGroups/<YOUR-DEV-PROD-MG>"
+                    "/providers/Microsoft.Management/managementGroups/P4CX-dev"
                 ],
                 "tenant": [
-                    "/providers/Microsoft.Management/managementGroups/<YOUR-PROD-MG>"
+                    "/providers/Microsoft.Management/managementGroups/it"
                 ]
             }
         },
@@ -42,10 +42,10 @@
             "parameterSelector": "nonprod",
             "scope": {
                 "epac-dev": [
-                    "/providers/Microsoft.Management/managementGroups/<YOUR-DEV-NONPROD-MG>"
+                    "/providers/Microsoft.Management/managementGroups/P4CX-dev"
                 ],
                 "tenant": [
-                    "/providers/Microsoft.Management/managementGroups/<YOUR-NONPROD-MG>"
+                    "/providers/Microsoft.Management/managementGroups/sales"
                 ]
             }
         }
