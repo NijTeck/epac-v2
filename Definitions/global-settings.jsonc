@@ -7,7 +7,7 @@
             "pacSelector": "epac-dev",
             "cloud": "AzureCloud",
             "tenantId": "e1f3e196-aa55-4709-9c55-0e334c0b444f",
-            "deploymentRootScope": "/providers/Microsoft.Management/managementGroups/P4CX-dev",
+            "deploymentRootScope": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f",
             "desiredState": {
                 "strategy": "ownedOnly",
                 "keepDfcSecurityAssignments": false,

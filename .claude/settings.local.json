@@ -24,7 +24,9 @@
       "Bash(gh secret set:*)",
       "Bash(git checkout:*)",
       "Bash(gh run list:*)",
-      "Bash(gh workflow list:*)"
+      "Bash(gh workflow list:*)",
+      "Bash(gh run watch:*)",
+      "Bash(gh run view:*)"
     ],
     "deny": [],
     "ask": []

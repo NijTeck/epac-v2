@@ -1,52 +1,23 @@
 {
     "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-assignment-schema.json",
-    "nodeName": "/NIST-800-53/",
+    "nodeName": "/",
+    "scope": {
+        "epac-dev": [
+            "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f"
+        ],
+        "tenant": [
+            "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f"
+        ]
+    },
     "parameterFile": "nist-800-53-parameters.csv",
     "definitionEntryList": [
         {
             "policySetId": "/providers/Microsoft.Authorization/policySetDefinitions/179d1daa-458f-4e47-8086-2a68d0d6c38f",
             "displayName": "NIST SP 800-53 Rev. 5",
             "assignment": {
-                "append": true,
                 "name": "nist-800-53-r5",
-                "displayName": "NIST SP 800-53 Rev. 5",
-                "description": "NIST SP 800-53 Rev. 5 compliance framework for Azure resources."
-            }
-        }
-    ],
-    "children": [
-        {
-            "nodeName": "Prod/",
-            "assignment": {
-                "name": "pr-",
-                "displayName": "Prod ",
-                "description": "Production environment NIST 800-53 controls enforcement with "
-            },
-            "parameterSelector": "prod",
-            "scope": {
-                "epac-dev": [
-                    "/providers/Microsoft.Management/managementGroups/P4CX-dev"
-                ],
-                "tenant": [
-                    "/providers/Microsoft.Management/managementGroups/it"
-                ]
-            }
-        },
-        {
-            "nodeName": "Nonprod/",
-            "assignment": {
-                "name": "np-",
-                "displayName": "Nonprod ",
-                "description": "Non-production environment NIST 800-53 controls enforcement with "
-            },
-            "parameterSelector": "nonprod",
-            "scope": {
-                "epac-dev": [
-                    "/providers/Microsoft.Management/managementGroups/P4CX-dev"
-                ],
-                "tenant": [
-                    "/providers/Microsoft.Management/managementGroups/sales"
-                ]
+                "displayName": "NIST SP 800-53 Rev. 5 Compliance",
+                "description": "NIST SP 800-53 Rev. 5 compliance framework for Azure resources enforced at Tenant Root Group level."
             }
         }
     ]
