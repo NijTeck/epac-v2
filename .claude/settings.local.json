@@ -21,7 +21,10 @@
       "Bash(powershell.exe -File assign-remaining-roles.ps1)",
       "Bash(gh auth:*)",
       "Bash(gh api:*)",
-      "Bash(gh secret set:*)"
+      "Bash(gh secret set:*)",
+      "Bash(git checkout:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh workflow list:*)"
     ],
     "deny": [],
     "ask": []
