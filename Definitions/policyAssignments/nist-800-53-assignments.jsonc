@@ -10,6 +10,7 @@
         ]
     },
     "parameterFile": "nist-800-53-parameters.csv",
+    "parameterSelector": "default",
     "definitionEntryList": [
         {
             "policySetId": "/providers/Microsoft.Authorization/policySetDefinitions/179d1daa-458f-4e47-8086-2a68d0d6c38f",
