@@ -1,0 +1,224 @@
+name: Auto-Remediation for NIST 800-53
+
+on:
+  # Run after successful policy deployment
+  workflow_run:
+    workflows: ["Deploy EPAC"]
+    types:
+      - completed
+    branches:
+      - main
+      - working-nist800-controls
+
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to remediate'
+        required: true
+        default: 'TENANT'
+        type: choice
+        options:
+          - TENANT
+          - EPAC-DEV
+
+      scope:
+        description: 'Scope for remediation (management group or subscription ID)'
+        required: false
+        default: 'e1f3e196-aa55-4709-9c55-0e334c0b444f'
+
+jobs:
+  check-compliance:
+    runs-on: ubuntu-latest
+    outputs:
+      non_compliant_count: ${{ steps.check.outputs.non_compliant_count }}
+      should_remediate: ${{ steps.check.outputs.should_remediate }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Check Compliance State
+        id: check
+        run: |
+          # Get non-compliant resources count
+          NON_COMPLIANT=$(az policy state list \
+            --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
+            --filter "complianceState eq 'NonCompliant' and policySetDefinitionName eq 'NIST SP 800-53 Rev. 5'" \
+            --query "length(@)" -o tsv)
+
+          echo "non_compliant_count=$NON_COMPLIANT" >> $GITHUB_OUTPUT
+
+          # Only remediate if there are non-compliant resources
+          if [ "$NON_COMPLIANT" -gt 0 ]; then
+            echo "should_remediate=true" >> $GITHUB_OUTPUT
+            echo "Found $NON_COMPLIANT non-compliant resources"
+          else
+            echo "should_remediate=false" >> $GITHUB_OUTPUT
+            echo "No non-compliant resources found"
+          fi
+
+  create-remediation-tasks:
+    needs: check-compliance
+    if: needs.check-compliance.outputs.should_remediate == 'true'
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'TENANT-DEPLOY-POLICY' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Create Remediation Tasks
+        run: |
+          # Get the policy assignment ID
+          ASSIGNMENT_ID=$(az policy assignment list \
+            --scope "/providers/Microsoft.Management/managementGroups/${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
+            --query "[?displayName=='NIST SP 800-53 Rev. 5'].id" -o tsv | head -1)
+
+          if [ -z "$ASSIGNMENT_ID" ]; then
+            echo "Error: Policy assignment not found"
+            exit 1
+          fi
+
+          echo "Creating remediation task for assignment: $ASSIGNMENT_ID"
+
+          # Create remediation task for all non-compliant policies
+          TASK_NAME="NIST-Remediation-$(date +%Y%m%d-%H%M%S)"
+
+          az policy remediation create \
+            --name "$TASK_NAME" \
+            --policy-assignment "$ASSIGNMENT_ID" \
+            --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
+            --resource-discovery-mode ReEvaluateCompliance \
+            --failure-threshold 0.5
+
+          echo "Remediation task created: $TASK_NAME"
+
+          # Store task name for monitoring
+          echo "REMEDIATION_TASK=$TASK_NAME" >> $GITHUB_ENV
+
+      - name: Monitor Remediation Progress
+        run: |
+          # Monitor the remediation task for up to 30 minutes
+          TIMEOUT=1800  # 30 minutes
+          INTERVAL=60   # Check every minute
+          ELAPSED=0
+
+          while [ $ELAPSED -lt $TIMEOUT ]; do
+            STATE=$(az policy remediation show \
+              --name "${{ env.REMEDIATION_TASK }}" \
+              --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
+              --query "provisioningState" -o tsv)
+
+            PROGRESS=$(az policy remediation show \
+              --name "${{ env.REMEDIATION_TASK }}" \
+              --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
+              --query "{Total: deploymentStatus.totalDeployments, Successful: deploymentStatus.successfulDeployments, Failed: deploymentStatus.failedDeployments}" -o json)
+
+            echo "Remediation State: $STATE"
+            echo "Progress: $PROGRESS"
+
+            if [ "$STATE" == "Succeeded" ] || [ "$STATE" == "Failed" ] || [ "$STATE" == "Canceled" ]; then
+              echo "Remediation completed with state: $STATE"
+              break
+            fi
+
+            sleep $INTERVAL
+            ELAPSED=$((ELAPSED + INTERVAL))
+          done
+
+          if [ $ELAPSED -ge $TIMEOUT ]; then
+            echo "Warning: Remediation task timed out after 30 minutes"
+          fi
+
+  generate-report:
+    needs: [check-compliance, create-remediation-tasks]
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Generate Compliance Report
+        run: |
+          # Generate a detailed compliance report
+          REPORT_FILE="compliance-report-$(date +%Y%m%d-%H%M%S).md"
+
+          echo "# NIST 800-53 Compliance Report" > $REPORT_FILE
+          echo "Generated: $(date)" >> $REPORT_FILE
+          echo "" >> $REPORT_FILE
+
+          # Get overall compliance
+          echo "## Overall Compliance" >> $REPORT_FILE
+          az policy state summarize \
+            --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
+            --query "results[?policySetDefinitionName=='NIST SP 800-53 Rev. 5']" \
+            -o table >> $REPORT_FILE
+
+          # Get non-compliant resources
+          echo "" >> $REPORT_FILE
+          echo "## Non-Compliant Resources" >> $REPORT_FILE
+          az policy state list \
+            --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
+            --filter "complianceState eq 'NonCompliant' and policySetDefinitionName eq 'NIST SP 800-53 Rev. 5'" \
+            --query "[].{Resource:resourceId, Policy:policyDefinitionName, Action:policyDefinitionAction}" \
+            -o table >> $REPORT_FILE
+
+          # Upload report as artifact
+          echo "Report generated: $REPORT_FILE"
+
+      - name: Upload Compliance Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: compliance-report
+          path: compliance-report-*.md
+          retention-days: 30
+
+  notify:
+    needs: [check-compliance, create-remediation-tasks, generate-report]
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Notification
+        run: |
+          # Create summary for GitHub Actions
+          echo "# NIST 800-53 Auto-Remediation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.check-compliance.outputs.should_remediate }}" == "true" ]; then
+            echo "✅ **Remediation Triggered**" >> $GITHUB_STEP_SUMMARY
+            echo "- Non-compliant resources found: ${{ needs.check-compliance.outputs.non_compliant_count }}" >> $GITHUB_STEP_SUMMARY
+            echo "- Remediation tasks created and executed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✨ **No Remediation Needed**" >> $GITHUB_STEP_SUMMARY
+            echo "- All resources are compliant" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📊 **Next Steps:**" >> $GITHUB_STEP_SUMMARY
+          echo "1. Review the compliance report in the workflow artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "2. Check Azure Portal for detailed remediation results" >> $GITHUB_STEP_SUMMARY
+          echo "3. Monitor resource compliance over time" >> $GITHUB_STEP_SUMMARY
