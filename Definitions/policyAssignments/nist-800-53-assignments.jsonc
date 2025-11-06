@@ -18,7 +18,10 @@
             "assignment": {
                 "name": "nist-800-53-r5",
                 "displayName": "NIST SP 800-53 Rev. 5 Compliance",
-                "description": "NIST SP 800-53 Rev. 5 compliance framework for Azure resources enforced at Tenant Root Group level."
+                "description": "NIST SP 800-53 Rev. 5 compliance framework for Azure resources enforced at Tenant Root Group level.",
+                "identity": {
+                    "type": "SystemAssigned"
+                }
             }
         }
     ]
