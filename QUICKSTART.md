@@ -1,126 +1,211 @@
-# NIST 800-53 EPAC - Quick Start Guide
+# Quick Start Guide
 
-## ✅ Implementation Complete!
+Get NIST 800-53 policies deployed in minutes.
 
-All code and configuration files have been created. Follow these steps to deploy.
+## Prerequisites
 
-## What Was Created
+- Azure subscription with Owner access
+- GitHub account
+- Azure CLI installed locally
 
-### Core Configuration
-- ✅ `Definitions/global-settings.jsonc` - Environment configuration
-- ✅ `Definitions/policyAssignments/nist-800-53-assignments.jsonc` - Policy assignments
-- ✅ `Definitions/policyAssignments/nist-800-53-parameters.csv` - NIST 800-53 policies (filtered)
+## Option 1: Deploy via GitHub Actions (Recommended)
 
-### GitHub Actions Workflows
-- ✅ `.github/workflows/epac-dev-workflow.yml` - Dev deployment
-- ✅ `.github/workflows/epac-tenant-workflow.yml` - Production deployment
-- ✅ `.github/workflows/plan.yml` - Reusable plan template
-- ✅ `.github/workflows/deploy-policy.yml` - Reusable policy deploy
-- ✅ `.github/workflows/deploy-roles.yml` - Reusable roles deploy
+### Step 1: Configure Service Principals
 
-### Documentation
-- ✅ `README.md` - Main documentation
-- ✅ `SERVICE_PRINCIPALS.md` - Service principal setup
-- ✅ `GITHUB_SETUP.md` - GitHub configuration
-- ✅ `DEPLOYMENT.md` - Deployment procedures
+The repository is already configured with service principals. Verify secrets are set:
 
-## Next Steps
+```bash
+gh secret list --repo NijTeck/epac-v2
+```
 
-### 1. Configure Your Environment (5 minutes)
+**Required secrets:**
+- `AZURE_CLIENT_ID`
+- `AZURE_TENANT_ID`
+- `AZURE_SUBSCRIPTION_ID`
 
-Edit `Definitions/global-settings.jsonc`:
-```jsonc
+### Step 2: Trigger Deployment
+
+**Deploy to Dev Environment:**
+```bash
+gh workflow run "EPAC Dev Workflow" --repo NijTeck/epac-v2 --ref working-nist800-controls
+```
+
+**Deploy to Production:**
+```bash
+gh workflow run "EPAC Tenant Workflow" --repo NijTeck/epac-v2 --ref main
+```
+
+**Watch Progress:**
+```bash
+gh run watch
+```
+
+### Step 3: Verify Deployment
+
+```bash
+# Check policy assignments
+az policy assignment list \
+  --management-group "e1f3e196-aa55-4709-9c55-0e334c0b444f" \
+  --query "[?displayName=='NIST SP 800-53 Rev. 5'].{Name:name,Scope:scope}" -o table
+
+# Check compliance
+az policy state summarize \
+  --management-group "e1f3e196-aa55-4709-9c55-0e334c0b444f"
+```
+
+---
+
+## Option 2: Deploy Locally
+
+### Step 1: Clone and Setup
+
+```bash
+# Clone repository
+git clone git@github.com:NijTeck/epac-v2.git
+cd epac-v2
+
+# Install EPAC module
+Install-Module EnterprisePolicyAsCode -Scope CurrentUser
+```
+
+### Step 2: Login to Azure
+
+```bash
+# Login
+az login
+
+# Set subscription
+az account set --subscription "120592c4-94bc-4ec2-b08f-de7f4055cfdf"
+
+# Or use PowerShell
+Connect-AzAccount
+```
+
+### Step 3: Build Deployment Plan
+
+```powershell
+# Build plan for dev environment
+Build-DeploymentPlans `
+  -DefinitionsRootFolder ".\Definitions" `
+  -OutputFolder ".\Output" `
+  -PacEnvironment "epac-dev"
+```
+
+### Step 4: Deploy Policies
+
+```powershell
+# Deploy policies
+Deploy-PolicyPlan `
+  -DefinitionsRootFolder ".\Definitions" `
+  -InputFolder ".\Output" `
+  -PacEnvironment "epac-dev"
+
+# Deploy role assignments
+Deploy-RolesPlan `
+  -DefinitionsRootFolder ".\Definitions" `
+  -InputFolder ".\Output" `
+  -PacEnvironment "epac-dev"
+```
+
+---
+
+## Configuration Files
+
+### Key Files to Modify
+
+**1. Policy Parameters** (`Definitions/policyAssignments/nist-800-53-parameters.csv`)
+- Controls policy effects (Audit, Deny, etc.)
+- Modify the `defaultEffect` column to change enforcement
+
+**2. Assignment Scope** (`Definitions/policyAssignments/nist-800-53-assignments.jsonc`)
+- Controls where policies are assigned
+- Currently assigned to Tenant Root Group
+
+**3. Global Settings** (`Definitions/global-settings.jsonc`)
+- Azure tenant and deployment configuration
+- Service principal settings
+
+---
+
+## Common Tasks
+
+### Check Current Enforcement Status
+```powershell
+.\Scripts\Analyze-PolicyEnforcement.ps1
+```
+
+### Run Remediation
+```powershell
+.\Scripts\Start-NISTRemediation.ps1 -Environment TENANT -WaitForCompletion
+```
+
+### Change Policy Effects
+Edit `Definitions/policyAssignments/nist-800-53-parameters.csv`:
+```csv
+displayName,defaultEffect
+"Network Security Groups should be enabled",Deny
+```
+
+Then commit and push:
+```bash
+git add Definitions/policyAssignments/nist-800-53-parameters.csv
+git commit -m "Update policy effects"
+git push
+```
+
+### View Compliance Report
+```bash
+# Summary
+az policy state summarize \
+  --management-group "e1f3e196-aa55-4709-9c55-0e334c0b444f"
+
+# Details
+az policy state list \
+  --management-group "e1f3e196-aa55-4709-9c55-0e334c0b444f" \
+  --filter "complianceState eq 'NonCompliant'" -o table
+```
+
+---
+
+## Troubleshooting
+
+### Deployment Fails with Permission Error
+```bash
+# Verify service principal has required roles
+az role assignment list \
+  --assignee <service-principal-id> \
+  --scope "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f"
+```
+
+**Required roles:**
+- Resource Policy Contributor
+- Role Based Access Control Administrator
+- Reader
+
+### No Policies Deployed
+Check the assignment scope in `nist-800-53-assignments.jsonc` matches your management group:
+```json
 {
-  "pacEnvironments": [
-    {
-      "pacSelector": "epac-dev",
-      "tenantId": "<YOUR-TENANT-ID>",  // Replace this
-      "deploymentRootScope": "/providers/Microsoft.Management/managementGroups/<YOUR-DEV-MG>",  // Replace this
-      "managedIdentityLocation": "eastus"  // Replace with your region
-    },
-    {
-      "pacSelector": "tenant",
-      "tenantId": "<YOUR-TENANT-ID>",  // Replace this
-      "deploymentRootScope": "/providers/Microsoft.Management/managementGroups/<YOUR-PROD-MG>",  // Replace this
-      "managedIdentityLocation": "eastus"  // Replace with your region
-    }
-  ]
+  "scope": {
+    "tenant": ["/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f"]
+  }
 }
 ```
 
-Edit `Definitions/policyAssignments/nist-800-53-assignments.jsonc`:
-- Replace `<YOUR-DEV-PROD-MG>` with your dev prod management group ID
-- Replace `<YOUR-PROD-MG>` with your production management group ID
-- Replace `<YOUR-DEV-NONPROD-MG>` with your dev nonprod management group ID
-- Replace `<YOUR-NONPROD-MG>` with your nonprod management group ID
+### Policies Not Enforcing
+Policies are in Audit mode by default. See [NIST-COMPLIANCE.md](NIST-COMPLIANCE.md) for enforcement instructions.
 
-### 2. Set Up Service Principals (15 minutes)
+---
 
-See `SERVICE_PRINCIPALS.md` for detailed instructions.
+## Next Steps
 
-Quick option - run the PowerShell script:
-```powershell
-# See SERVICE_PRINCIPALS.md for the full script
-.\Setup-ServicePrincipals.ps1 -TenantId "<YOUR-TENANT-ID>" ...
-```
+1. **Monitor compliance** for 30-60 days in audit mode
+2. **Review** [NIST-COMPLIANCE.md](NIST-COMPLIANCE.md) for enforcement options
+3. **Set up** automated remediation workflows
+4. **Plan** enforcement rollout strategy
 
-### 3. Configure GitHub (10 minutes)
+## Support
 
-See `GITHUB_SETUP.md` for detailed instructions.
-
-Create four GitHub environments with secrets:
-- EPAC-DEV
-- TENANT-PLAN
-- TENANT-DEPLOY-POLICY
-- TENANT-DEPLOY-ROLES
-
-### 4. Deploy! (5 minutes)
-
-```bash
-# Create feature branch
-git checkout -b feature/initial-nist-deployment
-
-# Commit your configuration changes
-git add Definitions/
-git commit -m "feat: configure NIST 800-53 deployment"
-
-# Push to trigger dev deployment
-git push origin feature/initial-nist-deployment
-
-# Watch GitHub Actions deploy to epac-dev automatically
-```
-
-## What's Different from Standard EPAC?
-
-This implementation is **simplified for NIST 800-53 only**:
-
-- ❌ No `policyDefinitions/` folder - NIST 800-53 is built-in
-- ❌ No `policySetDefinitions/` folder - NIST 800-53 is built-in
-- ✅ Only `policyAssignments/` - just assign and configure
-- ✅ Filtered CSV - only NIST 800-53 policies (not ASB, PCI-DSS, etc.)
-- ✅ Single compliance framework focus
-
-## Verification
-
-After deployment, verify in Azure Portal:
-1. Navigate to **Azure Policy** > **Assignments**
-2. Look for assignments named `pr-nist-800-53-r5` and `np-nist-800-53-r5`
-3. Check **Compliance** tab (takes 30-60 minutes for first evaluation)
-
-## Need Help?
-
-- 📖 Read `README.md` for full documentation
-- 🔧 Read `DEPLOYMENT.md` for deployment procedures
-- 🔐 Read `SERVICE_PRINCIPALS.md` for authentication setup
-- ⚙️ Read `GITHUB_SETUP.md` for GitHub configuration
-- 🐛 Check troubleshooting sections in each guide
-
-## Summary
-
-You now have a complete NIST 800-53 EPAC deployment ready to go. Just:
-1. Update the placeholder values in configuration files
-2. Set up service principals
-3. Configure GitHub environments
-4. Push your changes
-
-The GitHub Actions workflows will handle the rest!
+- GitHub Issues: https://github.com/NijTeck/epac-v2/issues
+- EPAC Documentation: https://aka.ms/epac
+- Azure Policy Docs: https://aka.ms/azurepolicy

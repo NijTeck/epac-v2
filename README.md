@@ -7,10 +7,17 @@ This repository contains the Enterprise Policy as Code (EPAC) deployment configu
 This implementation focuses exclusively on NIST 800-53 Rev. 5 (built-in Azure policy set ID: `179d1daa-458f-4e47-8086-2a68d0d6c38f`), providing:
 
 - ✅ **Automated deployment** via GitHub Actions
-- ✅ **Local management** from your computer using PowerShell
+- ✅ **Automated remediation** for non-compliant resources
 - ✅ **Dual environments**: epac-dev (testing) and tenant (production)
-- ✅ **Parameter-driven configuration** via CSV for 300+ NIST policies
+- ✅ **238 NIST 800-53 policies** deployed to Tenant Root Group
+- ✅ **Currently in Audit mode** (92.4% reporting, 1.7% enforcing)
 - ✅ **No custom policies needed** - uses built-in Azure policy set
+
+## Quick Links
+
+- 📖 **[Quick Start Guide](QUICKSTART.md)** - Get deployed in minutes
+- 🔒 **[NIST Compliance Guide](NIST-COMPLIANCE.md)** - Understanding audit vs enforcement mode
+- 🚀 **Deployment Status**: Working on branch `working-nist800-controls`
 
 ## Repository Structure
 
@@ -265,8 +272,8 @@ Get-AzPolicyAssignment | Where-Object { $_.Properties.DisplayName -like "*NIST*"
 
 ### Get Help
 
-- Review [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment checklist
-- Review [SERVICE_PRINCIPALS.md](SERVICE_PRINCIPALS.md) for authentication setup
+- Review [QUICKSTART.md](QUICKSTART.md) for quick deployment guide
+- Review [NIST-COMPLIANCE.md](NIST-COMPLIANCE.md) for compliance and enforcement
 - Check EPAC documentation: https://aka.ms/epac
 - Open GitHub issue for bugs or questions
 
