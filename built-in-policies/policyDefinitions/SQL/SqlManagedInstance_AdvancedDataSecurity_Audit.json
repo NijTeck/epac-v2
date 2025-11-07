@@ -1,0 +1,49 @@
+{
+  "properties": {
+    "displayName": "Azure Defender for SQL should be enabled for unprotected SQL Managed Instances",
+    "policyType": "BuiltIn",
+    "mode": "Indexed",
+    "description": "Audit each SQL Managed Instance without advanced data security.",
+    "metadata": {
+      "version": "1.0.2",
+      "category": "SQL"
+    },
+    "version": "1.0.2",
+    "parameters": {
+      "effect": {
+        "type": "string",
+        "defaultValue": "AuditIfNotExists",
+        "allowedValues": [
+          "AuditIfNotExists",
+          "Disabled"
+        ],
+        "metadata": {
+          "displayName": "Effect",
+          "description": "Enable or disable the execution of the policy"
+        }
+      }
+    },
+    "policyRule": {
+      "if": {
+        "field": "type",
+        "equals": "Microsoft.Sql/managedInstances"
+      },
+      "then": {
+        "effect": "[parameters('effect')]",
+        "details": {
+          "type": "Microsoft.Sql/managedInstances/securityAlertPolicies",
+          "name": "Default",
+          "existenceCondition": {
+            "field": "Microsoft.Sql/managedInstances/securityAlertPolicies/state",
+            "equals": "Enabled"
+          }
+        }
+      }
+    },
+    "versions": [
+      "1.0.2"
+    ]
+  },
+  "id": "/providers/Microsoft.Authorization/policyDefinitions/abfb7388-5bf4-4ad7-ba99-2cd2f41cebb9",
+  "name": "abfb7388-5bf4-4ad7-ba99-2cd2f41cebb9"
+}

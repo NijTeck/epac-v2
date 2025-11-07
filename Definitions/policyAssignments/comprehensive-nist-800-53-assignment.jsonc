@@ -19,11 +19,15 @@
     }
   },
   "parameters": {
+    // ============================================================
     // Security Contact Configuration
+    // ============================================================
     "securityContactEmail": "esere@lanl.gov",
     "securityContactPhone": "",
     
+    // ============================================================
     // Defender for Cloud Plans (Servers EXCLUDED - using CrowdStrike)
+    // ============================================================
     "enableDefenderForServers": "false",
     "enableDefenderForAppServices": "true",
     "enableDefenderForSqlServers": "true",
@@ -36,8 +40,29 @@
     "enableDefenderForOpenSourceDatabases": "true",
     "enableDefenderForCosmosDbs": "true",
     
+    // ============================================================
     // STIG Compliance
+    // ============================================================
     "includeArcMachinesForStig": "false"
+    
+    // ============================================================
+    // Policy Effect Overrides
+    // ============================================================
+    // You can override the effect of any built-in policy here
+    // Common effects: Audit, Deny, Disabled, AuditIfNotExists, DeployIfNotExists
+    //
+    // Example: Change specific policies from Audit to Deny
+    // "policyEffect_<policyId>": "Deny"
+    //
+    // To find policy IDs and their parameters:
+    // 1. Go to Azure Portal > Policy > Definitions
+    // 2. Search for the policy by name
+    // 3. View the policy JSON to see available parameters
+    //
+    // Examples (uncomment and modify as needed):
+    // "StorageAccountsShouldRestrictNetworkAccess_effect": "Deny",
+    // "SQLServersShouldHaveAuditingEnabled_effect": "DeployIfNotExists",
+    // "VirtualMachinesShouldEncryptTempDisks_effect": "Audit"
   },
   "managedIdentityLocations": {
     "epac-dev": "eastus",

@@ -1,0 +1,54 @@
+{
+  "properties": {
+    "displayName": "[Deprecated]: Endpoint protection solution should be installed on virtual machine scale sets",
+    "policyType": "BuiltIn",
+    "mode": "Indexed",
+    "description": "Audit the existence and health of an endpoint protection solution on your virtual machines scale sets, to protect them from threats and vulnerabilities.",
+    "metadata": {
+      "version": "3.1.0-deprecated",
+      "category": "Security Center",
+      "deprecated": true
+    },
+    "version": "3.1.0",
+    "parameters": {
+      "effect": {
+        "type": "string",
+        "defaultValue": "Disabled",
+        "allowedValues": [
+          "AuditIfNotExists",
+          "Disabled"
+        ],
+        "metadata": {
+          "displayName": "Effect",
+          "description": "Enable or disable the execution of the policy"
+        }
+      }
+    },
+    "policyRule": {
+      "if": {
+        "field": "type",
+        "equals": "Microsoft.Compute/virtualMachineScaleSets"
+      },
+      "then": {
+        "effect": "[parameters('effect')]",
+        "details": {
+          "type": "Microsoft.Security/assessments",
+          "name": "e71020c2-860c-3235-cd39-04f3f8c936d2",
+          "existenceCondition": {
+            "field": "Microsoft.Security/assessments/status.code",
+            "in": [
+              "NotApplicable",
+              "Healthy"
+            ]
+          }
+        }
+      }
+    },
+    "versions": [
+      "3.1.0",
+      "3.0.0"
+    ]
+  },
+  "id": "/providers/Microsoft.Authorization/policyDefinitions/26a828e1-e88f-464e-bbb3-c134a282b9de",
+  "name": "26a828e1-e88f-464e-bbb3-c134a282b9de"
+}
