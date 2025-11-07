@@ -585,13 +585,13 @@ NIST_SP_800-53_R5_CP-9","ASB: Audit (default: keyVaultsShouldHavePurgeProtection
 NIST-800-53: Audit (default: effect-0b60c0b2-2dc2-4e1c-b5c9-abbed971de53)","parameter:
   Deny,
   Audit,
-  Disabled","Audit","","Audit","Audit","",""
+  Disabled","Audit","","Deny","Audit","",""
 "1e66c121-a66a-4b1f-9b83-0fd99bf0fc2d","","BuiltIn","Key Vault","Key vaults should have soft delete enabled","Deleting a key vault without soft delete enabled permanently deletes all secrets, keys, and certificates stored in the key vault. Accidental deletion of a key vault can lead to permanent data loss. Soft delete allows you to recover an accidentally deleted key vault for a configurable retention period.","Azure_Security_Benchmark_v3.0_DP-8,
 NIST_SP_800-53_R5_CP-9","ASB: Audit (default: keyVaultsShouldHaveSoftDeleteEnabledMonitoringEffect),
 NIST-800-53: Audit (default: effect-1e66c121-a66a-4b1f-9b83-0fd99bf0fc2d)","parameter:
   Deny,
   Audit,
-  Disabled","Audit","","Audit","Audit","",""
+  Disabled","Audit","","Deny","Audit","",""
 "cf820ca0-f99e-4f3e-84fb-66e913812d21","","BuiltIn","Key Vault","Resource logs in Key Vault should be enabled","Audit enabling of resource logs. This enables you to recreate activity trails to use for investigation purposes when a security incident occurs or when your network is compromised","Azure_Security_Benchmark_v3.0_DP-8,
 Azure_Security_Benchmark_v3.0_LT-3,
 NIST_SP_800-53_R5_AU-6(4),
