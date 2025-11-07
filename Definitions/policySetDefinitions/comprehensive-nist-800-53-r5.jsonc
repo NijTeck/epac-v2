@@ -3,9 +3,9 @@
   // Includes built-in Microsoft policies + custom policies organized by control family
   "name": "comprehensive-nist-800-53-r5",
   "properties": {
-    "displayName": "Comprehensive NIST SP 800-53 Rev. 5 with Custom Enforcement Policies",
+    "displayName": "Comprehensive NIST SP 800-53 R5.1.1 with Custom Enforcement Policies",
     "policyType": "Custom",
-    "description": "Complete NIST 800-53 Rev. 5 compliance framework including Microsoft's built-in 698 policies plus custom enforcement policies for SI (System Integrity), CM (Configuration Management), and IA (Identity & Authentication) control families. Organized by NIST control families for easier management.",
+    "description": "Complete NIST 800-53 R5.1.1 compliance framework including Microsoft's curated 224 policies plus custom enforcement policies for SI (System Integrity), CM (Configuration Management), and IA (Identity & Authentication) control families. Organized by NIST control families for easier management.",
     "metadata": {
       "version": "1.0.0",
       "category": "Regulatory Compliance",
@@ -269,11 +269,11 @@
       },
       
       // ============================================================
-      // Built-in NIST SP 800-53 Rev. 5 Initiative (698 policies)
+      // Built-in NIST SP 800-53 R5.1.1 Initiative (224 curated policies)
       // ============================================================
       {
-        "policyDefinitionReferenceId": "BuiltInNIST80053R5",
-        "policyDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/179d1daa-458f-4e47-8086-2a68d0d6c38f",
+        "policyDefinitionReferenceId": "BuiltInNIST80053R511",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/c3f5c4d9-9a1d-4a99-85c0-7f93e1b40b0f",
         "groupNames": [
           "NIST_SP_800-53_R5_AC",
           "NIST_SP_800-53_R5_AU",
