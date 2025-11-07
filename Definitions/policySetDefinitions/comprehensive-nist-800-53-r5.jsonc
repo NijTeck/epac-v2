@@ -1,0 +1,426 @@
+{
+  // Comprehensive NIST SP 800-53 Rev. 5 Policy Set
+  // Includes built-in Microsoft policies + custom policies organized by control family
+  "name": "comprehensive-nist-800-53-r5",
+  "properties": {
+    "displayName": "Comprehensive NIST SP 800-53 Rev. 5 with Custom Enforcement Policies",
+    "policyType": "Custom",
+    "description": "Complete NIST 800-53 Rev. 5 compliance framework including Microsoft's built-in 698 policies plus custom enforcement policies for SI (System Integrity), CM (Configuration Management), and IA (Identity & Authentication) control families. Organized by NIST control families for easier management.",
+    "metadata": {
+      "version": "1.0.0",
+      "category": "Regulatory Compliance",
+      "nistRevision": "5",
+      "customPolicies": true,
+      "controlFamilies": [
+        "AC - Access Control",
+        "AU - Audit and Accountability",
+        "CM - Configuration Management",
+        "IA - Identification and Authentication",
+        "IR - Incident Response",
+        "RA - Risk Assessment",
+        "SC - System and Communications Protection",
+        "SI - System and Information Integrity"
+      ]
+    },
+    "parameters": {
+      // Security Contact Parameters
+      "securityContactEmail": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Security Contact Email",
+          "description": "Email address for Defender for Cloud security alerts"
+        },
+        "defaultValue": "esere@lanl.gov"
+      },
+      "securityContactPhone": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Security Contact Phone",
+          "description": "Phone number for security contact (optional)"
+        },
+        "defaultValue": ""
+      },
+      
+      // Defender for Cloud Parameters
+      "enableDefenderForServers": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for Servers",
+          "description": "EXCLUDED - Using CrowdStrike for endpoint protection (SI-3, SI-4)"
+        },
+        "allowedValues": ["true", "false"],
+        "defaultValue": "false"
+      },
+      "enableDefenderForAppServices": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for App Services"
+        },
+        "allowedValues": ["true", "false"],
+        "defaultValue": "true"
+      },
+      "enableDefenderForSqlServers": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for SQL Servers"
+        },
+        "allowedValues": ["true", "false"],
+        "defaultValue": "true"
+      },
+      "enableDefenderForSqlServerVirtualMachines": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for SQL Server VMs"
+        },
+        "allowedValues": ["true", "false"],
+        "defaultValue": "true"
+      },
+      "enableDefenderForStorage": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for Storage"
+        },
+        "allowedValues": ["true", "false"],
+        "defaultValue": "true"
+      },
+      "enableDefenderForContainers": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for Containers"
+        },
+        "allowedValues": ["true", "false"],
+        "defaultValue": "true"
+      },
+      "enableDefenderForKeyVault": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for Key Vault"
+        },
+        "allowedValues": ["true", "false"],
+        "defaultValue": "true"
+      },
+      "enableDefenderForResourceManager": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for Resource Manager"
+        },
+        "allowedValues": ["true", "false"],
+        "defaultValue": "true"
+      },
+      "enableDefenderForDns": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for DNS"
+        },
+        "allowedValues": ["true", "false"],
+        "defaultValue": "true"
+      },
+      "enableDefenderForOpenSourceDatabases": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for Open-Source Databases"
+        },
+        "allowedValues": ["true", "false"],
+        "defaultValue": "true"
+      },
+      "enableDefenderForCosmosDbs": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for Azure Cosmos DB"
+        },
+        "allowedValues": ["true", "false"],
+        "defaultValue": "true"
+      },
+      
+      // STIG Compliance Parameters
+      "includeArcMachinesForStig": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Include Arc Machines for STIG Compliance",
+          "description": "Include Azure Arc connected servers in STIG compliance checks"
+        },
+        "allowedValues": ["true", "false"],
+        "defaultValue": "false"
+      }
+    },
+    "policyDefinitions": [
+      // ============================================================
+      // SI - System and Information Integrity (Custom Policies)
+      // ============================================================
+      {
+        "policyDefinitionReferenceId": "SI-DefenderPlansDeployment",
+        "policyDefinitionId": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f/providers/Microsoft.Authorization/policyDefinitions/custom-si-defender-plans-deployment",
+        "parameters": {
+          "enableDefenderForServers": {
+            "value": "[parameters('enableDefenderForServers')]"
+          },
+          "enableDefenderForAppServices": {
+            "value": "[parameters('enableDefenderForAppServices')]"
+          },
+          "enableDefenderForSqlServers": {
+            "value": "[parameters('enableDefenderForSqlServers')]"
+          },
+          "enableDefenderForSqlServerVirtualMachines": {
+            "value": "[parameters('enableDefenderForSqlServerVirtualMachines')]"
+          },
+          "enableDefenderForStorage": {
+            "value": "[parameters('enableDefenderForStorage')]"
+          },
+          "enableDefenderForContainers": {
+            "value": "[parameters('enableDefenderForContainers')]"
+          },
+          "enableDefenderForKeyVault": {
+            "value": "[parameters('enableDefenderForKeyVault')]"
+          },
+          "enableDefenderForResourceManager": {
+            "value": "[parameters('enableDefenderForResourceManager')]"
+          },
+          "enableDefenderForDns": {
+            "value": "[parameters('enableDefenderForDns')]"
+          },
+          "enableDefenderForOpenSourceDatabases": {
+            "value": "[parameters('enableDefenderForOpenSourceDatabases')]"
+          },
+          "enableDefenderForCosmosDbs": {
+            "value": "[parameters('enableDefenderForCosmosDbs')]"
+          }
+        },
+        "groupNames": [
+          "NIST_SP_800-53_R5_SI-3",
+          "NIST_SP_800-53_R5_SI-4"
+        ]
+      },
+      {
+        "policyDefinitionReferenceId": "SI-SecurityContactsConfig",
+        "policyDefinitionId": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f/providers/Microsoft.Authorization/policyDefinitions/custom-si-security-contacts",
+        "parameters": {
+          "securityContactEmail": {
+            "value": "[parameters('securityContactEmail')]"
+          },
+          "securityContactPhone": {
+            "value": "[parameters('securityContactPhone')]"
+          },
+          "notifyOnAlert": {
+            "value": "On"
+          },
+          "notifyToAdmins": {
+            "value": "On"
+          },
+          "minimalSeverity": {
+            "value": "Low"
+          }
+        },
+        "groupNames": [
+          "NIST_SP_800-53_R5_SI-4",
+          "NIST_SP_800-53_R5_IR-6",
+          "NIST_SP_800-53_R5_AU-6"
+        ]
+      },
+      {
+        "policyDefinitionReferenceId": "SI-VulnerabilityAssessment",
+        "policyDefinitionId": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f/providers/Microsoft.Authorization/policyDefinitions/custom-si-vulnerability-assessment",
+        "parameters": {
+          "vaType": {
+            "value": "mdeTvm"
+          }
+        },
+        "groupNames": [
+          "NIST_SP_800-53_R5_SI-2",
+          "NIST_SP_800-53_R5_RA-5"
+        ]
+      },
+      
+      // ============================================================
+      // CM - Configuration Management (Custom STIG Policies)
+      // ============================================================
+      {
+        "policyDefinitionReferenceId": "CM-WindowsSTIGCompliance",
+        "policyDefinitionId": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f/providers/Microsoft.Authorization/policyDefinitions/custom-cm-windows-stig-compliance",
+        "parameters": {
+          "IncludeArcMachines": {
+            "value": "[parameters('includeArcMachinesForStig')]"
+          },
+          "effect": {
+            "value": "AuditIfNotExists"
+          }
+        },
+        "groupNames": [
+          "NIST_SP_800-53_R5_CM-6",
+          "NIST_SP_800-53_R5_CM-2",
+          "NIST_SP_800-53_R5_CM-7"
+        ]
+      },
+      {
+        "policyDefinitionReferenceId": "CM-LinuxSTIGCompliance",
+        "policyDefinitionId": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f/providers/Microsoft.Authorization/policyDefinitions/custom-cm-linux-stig-compliance",
+        "parameters": {
+          "IncludeArcMachines": {
+            "value": "[parameters('includeArcMachinesForStig')]"
+          },
+          "effect": {
+            "value": "AuditIfNotExists"
+          }
+        },
+        "groupNames": [
+          "NIST_SP_800-53_R5_CM-6",
+          "NIST_SP_800-53_R5_CM-2",
+          "NIST_SP_800-53_R5_CM-7"
+        ]
+      },
+      
+      // ============================================================
+      // Built-in NIST SP 800-53 Rev. 5 Initiative (698 policies)
+      // ============================================================
+      {
+        "policyDefinitionReferenceId": "BuiltInNIST80053R5",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/179d1daa-458f-4e47-8086-2a68d0d6c38f",
+        "groupNames": [
+          "NIST_SP_800-53_R5_AC",
+          "NIST_SP_800-53_R5_AU",
+          "NIST_SP_800-53_R5_CM",
+          "NIST_SP_800-53_R5_CP",
+          "NIST_SP_800-53_R5_IA",
+          "NIST_SP_800-53_R5_IR",
+          "NIST_SP_800-53_R5_MA",
+          "NIST_SP_800-53_R5_MP",
+          "NIST_SP_800-53_R5_PE",
+          "NIST_SP_800-53_R5_PL",
+          "NIST_SP_800-53_R5_PS",
+          "NIST_SP_800-53_R5_PT",
+          "NIST_SP_800-53_R5_RA",
+          "NIST_SP_800-53_R5_SA",
+          "NIST_SP_800-53_R5_SC",
+          "NIST_SP_800-53_R5_SI",
+          "NIST_SP_800-53_R5_SR"
+        ]
+      },
+      
+      // ============================================================
+      // Guest Configuration Prerequisites
+      // ============================================================
+      {
+        "policyDefinitionReferenceId": "GuestConfigPrerequisites",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/12794019-7a00-42cf-95c2-882eed337cc8",
+        "groupNames": [
+          "NIST_SP_800-53_R5_CM-6",
+          "NIST_SP_800-53_R5_AC-3",
+          "NIST_SP_800-53_R5_IA-5"
+        ]
+      }
+    ],
+    "policyDefinitionGroups": [
+      {
+        "name": "NIST_SP_800-53_R5_AC",
+        "displayName": "AC - Access Control"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_AU",
+        "displayName": "AU - Audit and Accountability"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_CM",
+        "displayName": "CM - Configuration Management"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_CM-2",
+        "displayName": "CM-2 - Baseline Configuration"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_CM-6",
+        "displayName": "CM-6 - Configuration Settings"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_CM-7",
+        "displayName": "CM-7 - Least Functionality"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_CP",
+        "displayName": "CP - Contingency Planning"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_IA",
+        "displayName": "IA - Identification and Authentication"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_IA-5",
+        "displayName": "IA-5 - Authenticator Management"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_IR",
+        "displayName": "IR - Incident Response"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_IR-6",
+        "displayName": "IR-6 - Incident Reporting"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_MA",
+        "displayName": "MA - Maintenance"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_MP",
+        "displayName": "MP - Media Protection"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_PE",
+        "displayName": "PE - Physical and Environmental Protection"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_PL",
+        "displayName": "PL - Planning"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_PS",
+        "displayName": "PS - Personnel Security"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_PT",
+        "displayName": "PT - PII Processing and Transparency"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_RA",
+        "displayName": "RA - Risk Assessment"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_RA-5",
+        "displayName": "RA-5 - Vulnerability Monitoring and Scanning"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_SA",
+        "displayName": "SA - System and Services Acquisition"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_SC",
+        "displayName": "SC - System and Communications Protection"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_SI",
+        "displayName": "SI - System and Information Integrity"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_SI-2",
+        "displayName": "SI-2 - Flaw Remediation"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_SI-3",
+        "displayName": "SI-3 - Malicious Code Protection"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_SI-4",
+        "displayName": "SI-4 - System Monitoring"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_AU-6",
+        "displayName": "AU-6 - Audit Record Review, Analysis, and Reporting"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_AC-3",
+        "displayName": "AC-3 - Access Enforcement"
+      },
+      {
+        "name": "NIST_SP_800-53_R5_SR",
+        "displayName": "SR - Supply Chain Risk Management"
+      }
+    ]
+  }
+}

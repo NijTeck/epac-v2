@@ -1,23 +1,33 @@
-# NIST 800-53 Enterprise Policy as Code (EPAC)
+# NIST 800-53 Rev. 5 - Enterprise Azure Policy as Code (EPAC)
 
-This repository contains the Enterprise Policy as Code (EPAC) deployment configuration for **NIST 800-53 Rev. 5** compliance framework only.
+Comprehensive NIST 800-53 Rev. 5 compliance implementation with automated enforcement.
 
-## Overview
+## What's Deployed
 
-This implementation focuses exclusively on NIST 800-53 Rev. 5 (built-in Azure policy set ID: `179d1daa-458f-4e47-8086-2a68d0d6c38f`), providing:
+- **698 Microsoft built-in NIST policies** + **5 custom enforcement policies**
+- **Organized by control families** (AC, AU, CM, IA, SC, SI, etc.)
+- **Automated deployment** via GitHub Actions
+- **Enforcement mode** for all enforceable policies
+- **Dual environments**: epac-dev (testing) and tenant (production)
 
-- ✅ **Automated deployment** via GitHub Actions
-- ✅ **Automated remediation** for non-compliant resources
-- ✅ **Dual environments**: epac-dev (testing) and tenant (production)
-- ✅ **238 NIST 800-53 policies** deployed to Tenant Root Group
-- ✅ **Currently in Audit mode** (92.4% reporting, 1.7% enforcing)
-- ✅ **No custom policies needed** - uses built-in Azure policy set
+## Key Features
 
-## Quick Links
+✅ **Defender for Cloud** - Auto-deployed (excluding Servers - using CrowdStrike)  
+✅ **Security Contacts** - esere@lanl.gov for all alerts  
+✅ **STIG Compliance** - Windows and Linux VM baselines  
+✅ **Vulnerability Assessment** - Auto-deployed on VMs  
+✅ **Guest Configuration** - Prerequisites included  
 
-- 📖 **[Quick Start Guide](QUICKSTART.md)** - Get deployed in minutes
-- 🔒 **[NIST Compliance Guide](NIST-COMPLIANCE.md)** - Understanding audit vs enforcement mode
-- 🚀 **Deployment Status**: Working on branch `working-nist800-controls`
+## Quick Start
+
+See **[NIST-800-53-IMPLEMENTATION.md](NIST-800-53-IMPLEMENTATION.md)** for complete guide.
+
+```powershell
+# Deploy everything
+Build-DeploymentPlans -PacEnvironmentSelector "epac-dev"
+Deploy-PolicyPlan -PacEnvironmentSelector "epac-dev"
+Deploy-RolesPlan -PacEnvironmentSelector "epac-dev"
+```
 
 ## Repository Structure
 

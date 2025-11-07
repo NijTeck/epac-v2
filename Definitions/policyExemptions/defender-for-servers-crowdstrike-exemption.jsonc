@@ -1,0 +1,36 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-exemption-schema.json",
+  "nodeName": "/",
+  "scope": {
+    "epac-dev": [
+      "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f"
+    ],
+    "tenant": [
+      "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f"
+    ]
+  },
+  "exemptions": [
+    {
+      "name": "defender-servers-crowdstrike",
+      "displayName": "Defender for Servers - Using CrowdStrike",
+      "description": "Exemption for Microsoft Defender for Servers requirement. Organization uses CrowdStrike for endpoint protection to satisfy NIST 800-53 SI-3 (Malicious Code Protection) and SI-4 (System Monitoring) controls.",
+      "exemptionCategory": "Mitigated",
+      "expiresOn": "2025-12-31",
+      "policyAssignmentId": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f/providers/Microsoft.Authorization/policyAssignments/nist-800-53-r5-comprehensive",
+      "policyDefinitionReferenceIds": [
+        "SI-DefenderPlansDeployment"
+      ],
+      "metadata": {
+        "nistControls": [
+          "SI-3",
+          "SI-4"
+        ],
+        "compensatingControl": "CrowdStrike Falcon",
+        "justification": "CrowdStrike Falcon provides equivalent or superior endpoint protection, threat detection, and system monitoring capabilities",
+        "approvedBy": "Security Team",
+        "approvalDate": "2024-01-15",
+        "reviewDate": "2025-06-30"
+      }
+    }
+  ]
+}

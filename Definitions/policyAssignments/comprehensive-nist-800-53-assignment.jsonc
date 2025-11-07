@@ -1,0 +1,49 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-assignment-schema.json",
+  "nodeName": "/",
+  "scope": {
+    "epac-dev": [
+      "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f"
+    ],
+    "tenant": [
+      "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f"
+    ]
+  },
+  "definitionEntry": {
+    "policySetId": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f/providers/Microsoft.Authorization/policySetDefinitions/comprehensive-nist-800-53-r5",
+    "displayName": "Comprehensive NIST SP 800-53 Rev. 5",
+    "assignment": {
+      "name": "nist-800-53-r5-comprehensive",
+      "displayName": "Comprehensive NIST SP 800-53 Rev. 5 Compliance with Custom Enforcement",
+      "description": "Complete NIST 800-53 Rev. 5 compliance framework including Microsoft's 698 built-in policies plus custom enforcement policies for SI, CM, and IA control families. Organized by NIST control families. Defender for Servers excluded (using CrowdStrike). Security contact: esere@lanl.gov",
+      "identity": {
+        "type": "SystemAssigned"
+      }
+    }
+  },
+  "parameters": {
+    // Security Contact Configuration
+    "securityContactEmail": "esere@lanl.gov",
+    "securityContactPhone": "",
+    
+    // Defender for Cloud Plans (Servers EXCLUDED - using CrowdStrike)
+    "enableDefenderForServers": "false",
+    "enableDefenderForAppServices": "true",
+    "enableDefenderForSqlServers": "true",
+    "enableDefenderForSqlServerVirtualMachines": "true",
+    "enableDefenderForStorage": "true",
+    "enableDefenderForContainers": "true",
+    "enableDefenderForKeyVault": "true",
+    "enableDefenderForResourceManager": "true",
+    "enableDefenderForDns": "true",
+    "enableDefenderForOpenSourceDatabases": "true",
+    "enableDefenderForCosmosDbs": "true",
+    
+    // STIG Compliance
+    "includeArcMachinesForStig": "false"
+  },
+  "managedIdentityLocations": {
+    "epac-dev": "eastus",
+    "tenant": "eastus"
+  }
+}

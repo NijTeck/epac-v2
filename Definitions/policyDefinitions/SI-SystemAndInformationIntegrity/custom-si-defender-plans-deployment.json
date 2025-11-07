@@ -1,0 +1,391 @@
+{
+  "name": "custom-si-defender-plans-deployment",
+  "properties": {
+    "displayName": "[Custom] Deploy Microsoft Defender for Cloud plans for NIST SI controls",
+    "policyType": "Custom",
+    "mode": "All",
+    "description": "Automatically deploys Microsoft Defender for Cloud plans to subscriptions to satisfy NIST 800-53 SI-3 (Malicious Code Protection) and SI-4 (System Monitoring) controls. This policy ensures threat detection and vulnerability assessment capabilities are enabled.",
+    "metadata": {
+      "version": "1.0.0",
+      "category": "Security Center",
+      "nistControls": [
+        "SI-3",
+        "SI-4",
+        "SI-2"
+      ]
+    },
+    "parameters": {
+      "enableDefenderForServers": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for Servers",
+          "description": "Enable Microsoft Defender for Servers (EXCLUDED - using CrowdStrike for endpoint protection)"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "false"
+      },
+      "defenderForServersPlan": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Defender for Servers Plan",
+          "description": "Select the Defender for Servers plan tier"
+        },
+        "allowedValues": [
+          "P1",
+          "P2"
+        ],
+        "defaultValue": "P2"
+      },
+      "enableDefenderForAppServices": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for App Services",
+          "description": "Enable Microsoft Defender for App Services (required for SI-3, SI-4)"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true"
+      },
+      "enableDefenderForSqlServers": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for SQL Servers",
+          "description": "Enable Microsoft Defender for SQL Servers (required for SI-3, SI-4)"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true"
+      },
+      "enableDefenderForSqlServerVirtualMachines": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for SQL Server Virtual Machines",
+          "description": "Enable Microsoft Defender for SQL Server on Virtual Machines (required for SI-3, SI-4)"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true"
+      },
+      "enableDefenderForStorage": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for Storage",
+          "description": "Enable Microsoft Defender for Storage (required for SI-3, SI-4)"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true"
+      },
+      "enableDefenderForContainers": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for Containers",
+          "description": "Enable Microsoft Defender for Containers (required for SI-3, SI-4)"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true"
+      },
+      "enableDefenderForKeyVault": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for Key Vault",
+          "description": "Enable Microsoft Defender for Key Vault (required for SI-4)"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true"
+      },
+      "enableDefenderForResourceManager": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for Resource Manager",
+          "description": "Enable Microsoft Defender for Resource Manager (required for SI-4)"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true"
+      },
+      "enableDefenderForDns": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for DNS",
+          "description": "Enable Microsoft Defender for DNS (required for SI-4)"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true"
+      },
+      "enableDefenderForOpenSourceDatabases": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for Open-Source Databases",
+          "description": "Enable Microsoft Defender for Open-Source Relational Databases (required for SI-3, SI-4)"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true"
+      },
+      "enableDefenderForCosmosDbs": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Enable Defender for Azure Cosmos DB",
+          "description": "Enable Microsoft Defender for Azure Cosmos DB (required for SI-3, SI-4)"
+        },
+        "allowedValues": [
+          "true",
+          "false"
+        ],
+        "defaultValue": "true"
+      },
+      "effect": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Effect",
+          "description": "Enable or disable the execution of the policy"
+        },
+        "allowedValues": [
+          "DeployIfNotExists",
+          "AuditIfNotExists",
+          "Disabled"
+        ],
+        "defaultValue": "DeployIfNotExists"
+      }
+    },
+    "policyRule": {
+      "if": {
+        "field": "type",
+        "equals": "Microsoft.Resources/subscriptions"
+      },
+      "then": {
+        "effect": "[parameters('effect')]",
+        "details": {
+          "type": "Microsoft.Security/pricings",
+          "deploymentScope": "subscription",
+          "existenceScope": "subscription",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/fb1c8493-542b-48eb-b624-b4c8fea62acd"
+          ],
+          "existenceCondition": {
+            "allOf": [
+              {
+                "field": "Microsoft.Security/pricings/pricingTier",
+                "equals": "Standard"
+              }
+            ]
+          },
+          "deployment": {
+            "location": "eastus",
+            "properties": {
+              "mode": "incremental",
+              "parameters": {
+                "enableDefenderForServers": {
+                  "value": "[parameters('enableDefenderForServers')]"
+                },
+                "defenderForServersPlan": {
+                  "value": "[parameters('defenderForServersPlan')]"
+                },
+                "enableDefenderForAppServices": {
+                  "value": "[parameters('enableDefenderForAppServices')]"
+                },
+                "enableDefenderForSqlServers": {
+                  "value": "[parameters('enableDefenderForSqlServers')]"
+                },
+                "enableDefenderForSqlServerVirtualMachines": {
+                  "value": "[parameters('enableDefenderForSqlServerVirtualMachines')]"
+                },
+                "enableDefenderForStorage": {
+                  "value": "[parameters('enableDefenderForStorage')]"
+                },
+                "enableDefenderForContainers": {
+                  "value": "[parameters('enableDefenderForContainers')]"
+                },
+                "enableDefenderForKeyVault": {
+                  "value": "[parameters('enableDefenderForKeyVault')]"
+                },
+                "enableDefenderForResourceManager": {
+                  "value": "[parameters('enableDefenderForResourceManager')]"
+                },
+                "enableDefenderForDns": {
+                  "value": "[parameters('enableDefenderForDns')]"
+                },
+                "enableDefenderForOpenSourceDatabases": {
+                  "value": "[parameters('enableDefenderForOpenSourceDatabases')]"
+                },
+                "enableDefenderForCosmosDbs": {
+                  "value": "[parameters('enableDefenderForCosmosDbs')]"
+                }
+              },
+              "template": {
+                "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+                "contentVersion": "1.0.0.0",
+                "parameters": {
+                  "enableDefenderForServers": {
+                    "type": "string"
+                  },
+                  "defenderForServersPlan": {
+                    "type": "string"
+                  },
+                  "enableDefenderForAppServices": {
+                    "type": "string"
+                  },
+                  "enableDefenderForSqlServers": {
+                    "type": "string"
+                  },
+                  "enableDefenderForSqlServerVirtualMachines": {
+                    "type": "string"
+                  },
+                  "enableDefenderForStorage": {
+                    "type": "string"
+                  },
+                  "enableDefenderForContainers": {
+                    "type": "string"
+                  },
+                  "enableDefenderForKeyVault": {
+                    "type": "string"
+                  },
+                  "enableDefenderForResourceManager": {
+                    "type": "string"
+                  },
+                  "enableDefenderForDns": {
+                    "type": "string"
+                  },
+                  "enableDefenderForOpenSourceDatabases": {
+                    "type": "string"
+                  },
+                  "enableDefenderForCosmosDbs": {
+                    "type": "string"
+                  }
+                },
+                "resources": [
+                  {
+                    "condition": "[equals(parameters('enableDefenderForServers'), 'true')]",
+                    "type": "Microsoft.Security/pricings",
+                    "apiVersion": "2023-01-01",
+                    "name": "VirtualMachines",
+                    "properties": {
+                      "pricingTier": "Standard",
+                      "subPlan": "[parameters('defenderForServersPlan')]"
+                    }
+                  },
+                  {
+                    "condition": "[equals(parameters('enableDefenderForAppServices'), 'true')]",
+                    "type": "Microsoft.Security/pricings",
+                    "apiVersion": "2023-01-01",
+                    "name": "AppServices",
+                    "properties": {
+                      "pricingTier": "Standard"
+                    }
+                  },
+                  {
+                    "condition": "[equals(parameters('enableDefenderForSqlServers'), 'true')]",
+                    "type": "Microsoft.Security/pricings",
+                    "apiVersion": "2023-01-01",
+                    "name": "SqlServers",
+                    "properties": {
+                      "pricingTier": "Standard"
+                    }
+                  },
+                  {
+                    "condition": "[equals(parameters('enableDefenderForSqlServerVirtualMachines'), 'true')]",
+                    "type": "Microsoft.Security/pricings",
+                    "apiVersion": "2023-01-01",
+                    "name": "SqlServerVirtualMachines",
+                    "properties": {
+                      "pricingTier": "Standard"
+                    }
+                  },
+                  {
+                    "condition": "[equals(parameters('enableDefenderForStorage'), 'true')]",
+                    "type": "Microsoft.Security/pricings",
+                    "apiVersion": "2023-01-01",
+                    "name": "StorageAccounts",
+                    "properties": {
+                      "pricingTier": "Standard",
+                      "subPlan": "DefenderForStorageV2"
+                    }
+                  },
+                  {
+                    "condition": "[equals(parameters('enableDefenderForContainers'), 'true')]",
+                    "type": "Microsoft.Security/pricings",
+                    "apiVersion": "2023-01-01",
+                    "name": "Containers",
+                    "properties": {
+                      "pricingTier": "Standard"
+                    }
+                  },
+                  {
+                    "condition": "[equals(parameters('enableDefenderForKeyVault'), 'true')]",
+                    "type": "Microsoft.Security/pricings",
+                    "apiVersion": "2023-01-01",
+                    "name": "KeyVaults",
+                    "properties": {
+                      "pricingTier": "Standard"
+                    }
+                  },
+                  {
+                    "condition": "[equals(parameters('enableDefenderForResourceManager'), 'true')]",
+                    "type": "Microsoft.Security/pricings",
+                    "apiVersion": "2023-01-01",
+                    "name": "Arm",
+                    "properties": {
+                      "pricingTier": "Standard"
+                    }
+                  },
+                  {
+                    "condition": "[equals(parameters('enableDefenderForDns'), 'true')]",
+                    "type": "Microsoft.Security/pricings",
+                    "apiVersion": "2023-01-01",
+                    "name": "Dns",
+                    "properties": {
+                      "pricingTier": "Standard"
+                    }
+                  },
+                  {
+                    "condition": "[equals(parameters('enableDefenderForOpenSourceDatabases'), 'true')]",
+                    "type": "Microsoft.Security/pricings",
+                    "apiVersion": "2023-01-01",
+                    "name": "OpenSourceRelationalDatabases",
+                    "properties": {
+                      "pricingTier": "Standard"
+                    }
+                  },
+                  {
+                    "condition": "[equals(parameters('enableDefenderForCosmosDbs'), 'true')]",
+                    "type": "Microsoft.Security/pricings",
+                    "apiVersion": "2023-01-01",
+                    "name": "CosmosDbs",
+                    "properties": {
+                      "pricingTier": "Standard"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

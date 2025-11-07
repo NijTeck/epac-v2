@@ -1,0 +1,180 @@
+{
+  "name": "custom-si-security-contacts",
+  "properties": {
+    "displayName": "[Custom] Configure Microsoft Defender for Cloud security contacts for NIST SI controls",
+    "policyType": "Custom",
+    "mode": "All",
+    "description": "Automatically configures security contacts in Microsoft Defender for Cloud to satisfy NIST 800-53 SI-4 (System Monitoring) and IR-6 (Incident Reporting) controls. Ensures email notifications are sent for high severity alerts.",
+    "metadata": {
+      "version": "1.0.0",
+      "category": "Security Center",
+      "nistControls": [
+        "SI-4",
+        "IR-6",
+        "AU-6"
+      ]
+    },
+    "parameters": {
+      "securityContactEmail": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Security Contact Email",
+          "description": "Email address for security contact notifications"
+        },
+        "defaultValue": "esere@lanl.gov"
+      },
+      "securityContactPhone": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Security Contact Phone",
+          "description": "Phone number for security contact (optional)"
+        },
+        "defaultValue": ""
+      },
+      "notifyOnAlert": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Notify on Alert",
+          "description": "Send email notifications for high severity alerts"
+        },
+        "allowedValues": [
+          "On",
+          "Off"
+        ],
+        "defaultValue": "On"
+      },
+      "notifyToAdmins": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Notify Subscription Admins",
+          "description": "Send email notifications to subscription administrators"
+        },
+        "allowedValues": [
+          "On",
+          "Off"
+        ],
+        "defaultValue": "On"
+      },
+      "minimalSeverity": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Minimal Alert Severity",
+          "description": "Minimum severity level for email notifications"
+        },
+        "allowedValues": [
+          "High",
+          "Medium",
+          "Low"
+        ],
+        "defaultValue": "Low"
+      },
+      "effect": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Effect",
+          "description": "Enable or disable the execution of the policy"
+        },
+        "allowedValues": [
+          "DeployIfNotExists",
+          "AuditIfNotExists",
+          "Disabled"
+        ],
+        "defaultValue": "DeployIfNotExists"
+      }
+    },
+    "policyRule": {
+      "if": {
+        "field": "type",
+        "equals": "Microsoft.Resources/subscriptions"
+      },
+      "then": {
+        "effect": "[parameters('effect')]",
+        "details": {
+          "type": "Microsoft.Security/securityContacts",
+          "deploymentScope": "subscription",
+          "existenceScope": "subscription",
+          "roleDefinitionIds": [
+            "/providers/Microsoft.Authorization/roleDefinitions/fb1c8493-542b-48eb-b624-b4c8fea62acd"
+          ],
+          "existenceCondition": {
+            "allOf": [
+              {
+                "field": "Microsoft.Security/securityContacts/emails",
+                "notEquals": ""
+              },
+              {
+                "field": "Microsoft.Security/securityContacts/alertNotifications.state",
+                "equals": "[parameters('notifyOnAlert')]"
+              }
+            ]
+          },
+          "deployment": {
+            "location": "eastus",
+            "properties": {
+              "mode": "incremental",
+              "parameters": {
+                "securityContactEmail": {
+                  "value": "[parameters('securityContactEmail')]"
+                },
+                "securityContactPhone": {
+                  "value": "[parameters('securityContactPhone')]"
+                },
+                "notifyOnAlert": {
+                  "value": "[parameters('notifyOnAlert')]"
+                },
+                "notifyToAdmins": {
+                  "value": "[parameters('notifyToAdmins')]"
+                },
+                "minimalSeverity": {
+                  "value": "[parameters('minimalSeverity')]"
+                }
+              },
+              "template": {
+                "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+                "contentVersion": "1.0.0.0",
+                "parameters": {
+                  "securityContactEmail": {
+                    "type": "string"
+                  },
+                  "securityContactPhone": {
+                    "type": "string"
+                  },
+                  "notifyOnAlert": {
+                    "type": "string"
+                  },
+                  "notifyToAdmins": {
+                    "type": "string"
+                  },
+                  "minimalSeverity": {
+                    "type": "string"
+                  }
+                },
+                "resources": [
+                  {
+                    "type": "Microsoft.Security/securityContacts",
+                    "apiVersion": "2020-01-01-preview",
+                    "name": "default",
+                    "properties": {
+                      "emails": "[parameters('securityContactEmail')]",
+                      "phone": "[parameters('securityContactPhone')]",
+                      "alertNotifications": {
+                        "state": "[parameters('notifyOnAlert')]",
+                        "minimalSeverity": "[parameters('minimalSeverity')]"
+                      },
+                      "notificationsByRole": {
+                        "state": "[parameters('notifyToAdmins')]",
+                        "roles": [
+                          "Owner"
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
