@@ -29,7 +29,8 @@
       "Bash(gh run view:*)",
       "Bash(powershell.exe:*)",
       "Bash(gh workflow run:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "ask": []
