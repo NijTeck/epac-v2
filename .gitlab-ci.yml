@@ -1,0 +1,267 @@
+# GitLab CI/CD Pipeline for EPAC NIST 800-53 Deployment
+# This pipeline deploys Azure Policy as Code using OIDC authentication
+
+variables:
+  PAC_OUTPUT_FOLDER: "./Output"
+  PAC_DEFINITIONS_FOLDER: "./Definitions"
+  AZURE_TENANT_ID: "${AZURE_TENANT_ID}"
+  AZURE_CLIENT_ID: "${AZURE_CLIENT_ID}"
+
+# Define stages
+stages:
+  - plan-dev
+  - plan-tenant
+  - deploy-tenant-policy
+  - deploy-tenant-roles
+
+# Default settings for all jobs
+default:
+  image: mcr.microsoft.com/powershell:lts-ubuntu-22.04
+  before_script:
+    - |
+      # Install Azure CLI
+      curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+
+      # Install required PowerShell modules
+      pwsh -Command "Install-Module -Name Az -Force -AllowClobber -Scope CurrentUser"
+      pwsh -Command "Install-Module -Name EnterprisePolicyAsCode -Force -Scope CurrentUser"
+
+# ============================================================
+# DEV Environment - Triggers on feature branches
+# ============================================================
+plan-epac-dev:
+  stage: plan-dev
+  environment:
+    name: epac-dev
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^feature\//'
+      changes:
+        - Definitions/**/*
+        - .gitlab-ci.yml
+  id_tokens:
+    AZURE_ID_TOKEN:
+      aud: api://AzureADTokenExchange
+  script:
+    - |
+      echo "Authenticating to Azure using OIDC..."
+      az login --service-principal \
+        --username $AZURE_CLIENT_ID \
+        --tenant $AZURE_TENANT_ID \
+        --federated-token $AZURE_ID_TOKEN \
+        --allow-no-subscriptions
+
+      echo "Building EPAC deployment plan for epac-dev environment..."
+      pwsh -Command "Build-DeploymentPlans -PacEnvironmentSelector epac-dev -InformationAction Continue"
+
+      if (Test-Path $PAC_OUTPUT_FOLDER) {
+        echo "Deployment plan created successfully"
+      } else {
+        echo "No deployment plan generated"
+      }
+  artifacts:
+    paths:
+      - Output/
+    expire_in: 1 day
+    when: always
+
+deploy-epac-dev-policy:
+  stage: plan-dev
+  environment:
+    name: epac-dev
+  needs:
+    - job: plan-epac-dev
+      artifacts: true
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^feature\//'
+      changes:
+        - Definitions/**/*
+  id_tokens:
+    AZURE_ID_TOKEN:
+      aud: api://AzureADTokenExchange
+  script:
+    - |
+      if (!(Test-Path "$PAC_OUTPUT_FOLDER/plans-epac-dev/policy-plan.json")) {
+        echo "No policy changes to deploy"
+        exit 0
+      }
+
+      echo "Authenticating to Azure..."
+      az login --service-principal \
+        --username $AZURE_CLIENT_ID \
+        --tenant $AZURE_TENANT_ID \
+        --federated-token $AZURE_ID_TOKEN \
+        --allow-no-subscriptions
+
+      echo "Deploying policy changes to epac-dev..."
+      pwsh -Command "Deploy-PolicyPlan -PacEnvironmentSelector epac-dev -InformationAction Continue"
+
+deploy-epac-dev-roles:
+  stage: plan-dev
+  environment:
+    name: epac-dev
+  needs:
+    - job: plan-epac-dev
+      artifacts: true
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^feature\//'
+      changes:
+        - Definitions/**/*
+  id_tokens:
+    AZURE_ID_TOKEN:
+      aud: api://AzureADTokenExchange
+  script:
+    - |
+      if (!(Test-Path "$PAC_OUTPUT_FOLDER/plans-epac-dev/roles-plan.json")) {
+        echo "No role changes to deploy"
+        exit 0
+      }
+
+      echo "Authenticating to Azure..."
+      az login --service-principal \
+        --username $AZURE_CLIENT_ID \
+        --tenant $AZURE_TENANT_ID \
+        --federated-token $AZURE_ID_TOKEN \
+        --allow-no-subscriptions
+
+      echo "Deploying role changes to epac-dev..."
+      pwsh -Command "Deploy-RolesPlan -PacEnvironmentSelector epac-dev -InformationAction Continue"
+
+# ============================================================
+# TENANT (Production) Environment - Triggers on main branch
+# ============================================================
+plan-tenant:
+  stage: plan-tenant
+  environment:
+    name: tenant-plan
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes:
+        - Definitions/**/*
+        - .gitlab-ci.yml
+  id_tokens:
+    AZURE_ID_TOKEN:
+      aud: api://AzureADTokenExchange
+  script:
+    - |
+      echo "Authenticating to Azure using OIDC..."
+      az login --service-principal \
+        --username $AZURE_CLIENT_ID \
+        --tenant $AZURE_TENANT_ID \
+        --federated-token $AZURE_ID_TOKEN \
+        --allow-no-subscriptions
+
+      echo "Building EPAC deployment plan for tenant (production)..."
+      pwsh -Command "Build-DeploymentPlans -PacEnvironmentSelector tenant -InformationAction Continue"
+
+      if (Test-Path $PAC_OUTPUT_FOLDER) {
+        echo "Deployment plan created successfully"
+        echo "Review the plan before approving deployment"
+      } else {
+        echo "No deployment plan generated"
+      }
+  artifacts:
+    paths:
+      - Output/
+    expire_in: 7 days
+    reports:
+      dotenv: deploy.env
+
+deploy-tenant-policy:
+  stage: deploy-tenant-policy
+  environment:
+    name: tenant-deploy-policy
+    action: prepare
+  needs:
+    - job: plan-tenant
+      artifacts: true
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes:
+        - Definitions/**/*
+      when: manual
+  id_tokens:
+    AZURE_ID_TOKEN:
+      aud: api://AzureADTokenExchange
+  script:
+    - |
+      if (!(Test-Path "$PAC_OUTPUT_FOLDER/plans-tenant/policy-plan.json")) {
+        echo "No policy changes to deploy"
+        exit 0
+      }
+
+      echo "Authenticating to Azure..."
+      az login --service-principal \
+        --username $AZURE_CLIENT_ID \
+        --tenant $AZURE_TENANT_ID \
+        --federated-token $AZURE_ID_TOKEN \
+        --allow-no-subscriptions
+
+      echo "Deploying policy changes to production tenant..."
+      pwsh -Command "Deploy-PolicyPlan -PacEnvironmentSelector tenant -InformationAction Continue"
+
+      echo "Policy deployment completed successfully"
+
+deploy-tenant-roles:
+  stage: deploy-tenant-roles
+  environment:
+    name: tenant-deploy-roles
+    action: prepare
+  needs:
+    - job: plan-tenant
+      artifacts: true
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes:
+        - Definitions/**/*
+      when: manual
+  id_tokens:
+    AZURE_ID_TOKEN:
+      aud: api://AzureADTokenExchange
+  script:
+    - |
+      if (!(Test-Path "$PAC_OUTPUT_FOLDER/plans-tenant/roles-plan.json")) {
+        echo "No role changes to deploy"
+        exit 0
+      }
+
+      echo "Authenticating to Azure..."
+      az login --service-principal \
+        --username $AZURE_CLIENT_ID \
+        --tenant $AZURE_TENANT_ID \
+        --federated-token $AZURE_ID_TOKEN \
+        --allow-no-subscriptions
+
+      echo "Deploying role assignments to production tenant..."
+      pwsh -Command "Deploy-RolesPlan -PacEnvironmentSelector tenant -InformationAction Continue"
+
+      echo "Role deployment completed successfully"
+
+# ============================================================
+# Auto-Remediation (Optional) - Runs after policy deployment
+# ============================================================
+auto-remediation:
+  stage: deploy-tenant-roles
+  environment:
+    name: tenant-deploy-policy
+  needs:
+    - job: deploy-tenant-policy
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" && $ENABLE_AUTO_REMEDIATION == "true"'
+      when: on_success
+  id_tokens:
+    AZURE_ID_TOKEN:
+      aud: api://AzureADTokenExchange
+  script:
+    - |
+      echo "Authenticating to Azure..."
+      az login --service-principal \
+        --username $AZURE_CLIENT_ID \
+        --tenant $AZURE_TENANT_ID \
+        --federated-token $AZURE_ID_TOKEN \
+        --allow-no-subscriptions
+
+      echo "Starting auto-remediation for NIST 800-53 policies..."
+      pwsh -File "./Scripts/Start-NISTRemediation.ps1"
+
+      echo "Auto-remediation completed"
+  allow_failure: true
