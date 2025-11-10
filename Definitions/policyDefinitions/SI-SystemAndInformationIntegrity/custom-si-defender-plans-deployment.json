@@ -19,13 +19,13 @@
         "type": "String",
         "metadata": {
           "displayName": "Enable Defender for Servers",
-          "description": "Enable Microsoft Defender for Servers (EXCLUDED - using CrowdStrike for endpoint protection)"
+          "description": "Enable Microsoft Defender for Servers"
         },
         "allowedValues": [
           "true",
           "false"
         ],
-        "defaultValue": "false"
+        "defaultValue": "true"
       },
       "defenderForServersPlan": {
         "type": "String",
