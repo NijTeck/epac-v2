@@ -30,7 +30,12 @@
       "Bash(powershell.exe:*)",
       "Bash(gh workflow run:*)",
       "Bash(find:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(cat:*)",
+      "Bash(.github/workflows/automated-publish.yaml )",
+      "Bash(.github/workflows/gh-issues-to-ado.yaml)",
+      "Bash(for f in .github/workflows/*.yml)",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []
