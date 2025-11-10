@@ -16,7 +16,7 @@
 [CmdletBinding()]
 param (
     [Parameter()]
-    [string]$ManagementGroupId = "e1f3e196-aa55-4709-9c55-0e334c0b444f",
+    [string]$ManagementGroupId = "<YOUR_TENANT_ROOT_MG_ID>",
 
     [Parameter()]
     [ValidateSet("EPAC-DEV", "TENANT")]
