@@ -3,12 +3,11 @@ name: Auto-Remediation for NIST 800-53
 on:
   # Run after successful policy deployment
   workflow_run:
-    workflows: ["Deploy EPAC"]
+    workflows: ["EPAC Tenant Workflow"]
     types:
       - completed
     branches:
       - main
-      - working-nist800-controls
 
   # Allow manual trigger
   workflow_dispatch:
