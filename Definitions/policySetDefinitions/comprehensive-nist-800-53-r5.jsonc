@@ -266,6 +266,46 @@
           "NIST_SP_800-53_R5_CM-2",
           "NIST_SP_800-53_R5_CM-7"
         ]
+      },
+      
+      // ============================================================
+      // Built-in NIST SP 800-53 R5.1.1 Initiative (224 curated policies)
+      // ============================================================
+      {
+        "policyDefinitionReferenceId": "BuiltInNIST80053R511",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/60205a79-6280-4e20-a147-e2011e09dc78",
+        "groupNames": [
+          "NIST_SP_800-53_R5_AC",
+          "NIST_SP_800-53_R5_AU",
+          "NIST_SP_800-53_R5_CM",
+          "NIST_SP_800-53_R5_CP",
+          "NIST_SP_800-53_R5_IA",
+          "NIST_SP_800-53_R5_IR",
+          "NIST_SP_800-53_R5_MA",
+          "NIST_SP_800-53_R5_MP",
+          "NIST_SP_800-53_R5_PE",
+          "NIST_SP_800-53_R5_PL",
+          "NIST_SP_800-53_R5_PS",
+          "NIST_SP_800-53_R5_PT",
+          "NIST_SP_800-53_R5_RA",
+          "NIST_SP_800-53_R5_SA",
+          "NIST_SP_800-53_R5_SC",
+          "NIST_SP_800-53_R5_SI",
+          "NIST_SP_800-53_R5_SR"
+        ]
+      },
+      
+      // ============================================================
+      // Guest Configuration Prerequisites
+      // ============================================================
+      {
+        "policyDefinitionReferenceId": "GuestConfigPrerequisites",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policySetDefinitions/12794019-7a00-42cf-95c2-882eed337cc8",
+        "groupNames": [
+          "NIST_SP_800-53_R5_CM-6",
+          "NIST_SP_800-53_R5_AC-3",
+          "NIST_SP_800-53_R5_IA-5"
+        ]
       }
     ],
     "policyDefinitionGroups": [
