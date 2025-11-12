@@ -1,16 +1,13 @@
 {
     "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/global-settings-schema.json",
     // Configured for NIST 800-53 deployment
-    // Replace with your own GUID: pacOwnerId should be unique per EPAC deployment
-    "pacOwnerId": "<YOUR_PAC_OWNER_ID>",
+    "pacOwnerId": "8175d5de-d921-4a3c-b79f-5566e047f872",
     "pacEnvironments": [
         {
             "pacSelector": "epac-dev",
             "cloud": "AzureCloud",
-            // Replace with your Azure tenant ID
-            "tenantId": "<YOUR_TENANT_ID>",
-            // Replace with your management group ID (typically your tenant root group ID)
-            "deploymentRootScope": "/providers/Microsoft.Management/managementGroups/<YOUR_TENANT_ROOT_MG_ID>",
+            "tenantId": "e1f3e196-aa55-4709-9c55-0e334c0b444f",
+            "deploymentRootScope": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f",
             "desiredState": {
                 "strategy": "ownedOnly",
                 "keepDfcSecurityAssignments": false,
@@ -22,8 +19,8 @@
         {
             "pacSelector": "tenant",
             "cloud": "AzureCloud",
-            "tenantId": "<YOUR_TENANT_ID>",
-            "deploymentRootScope": "/providers/Microsoft.Management/managementGroups/<YOUR_TENANT_ROOT_MG_ID>",
+            "tenantId": "e1f3e196-aa55-4709-9c55-0e334c0b444f",
+            "deploymentRootScope": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f",
             "desiredState": {
                 "strategy": "full",
                 "keepDfcSecurityAssignments": false,
