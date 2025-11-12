@@ -1,4 +1,4 @@
-name: Auto-Remediation for NIST 800-53
+name: Auto-Remediation for Security Policies
 
 on:
   # Run after successful policy deployment
@@ -88,17 +88,18 @@ jobs:
 
       - name: Create Remediation Tasks
         run: |
-          # Get all policy assignment IDs with non-compliant resources
+          # Get all policy assignment IDs for enforcement frameworks
+          # Includes: NIST 800-53, MCSB (Microsoft Cloud Security Benchmark), and custom policies
           ASSIGNMENT_IDS=$(az policy assignment list \
             --scope "/providers/Microsoft.Management/managementGroups/${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
-            --query "[?contains(displayName, 'NIST')].{id:id,policyDefinitionId:policyDefinitionId}" -o json)
+            --query "[?contains(displayName, 'NIST') || contains(displayName, 'Microsoft cloud security benchmark') || contains(displayName, 'MCSB')].{id:id,policyDefinitionId:policyDefinitionId}" -o json)
 
           if [ -z "$ASSIGNMENT_IDS" ] || [ "$ASSIGNMENT_IDS" == "[]" ]; then
-            echo "Error: No NIST policy assignments found"
+            echo "Error: No enforcement policy assignments found (NIST, MCSB)"
             exit 1
           fi
 
-          echo "Found NIST policy assignments:"
+          echo "Found enforcement policy assignments (NIST, MCSB):"
           echo "$ASSIGNMENT_IDS" | jq -r '.[].id'
 
           # Process each assignment
@@ -173,10 +174,10 @@ jobs:
 
       - name: List Remediation Tasks
         run: |
-          echo "Listing all NIST remediation tasks..."
+          echo "Listing all remediation tasks (NIST, MCSB)..."
           az policy remediation list \
             --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
-            --query "[?contains(name, 'NIST-Remediation')].{Name:name, State:provisioningState, TotalDeployments:deploymentStatus.totalDeployments, SuccessfulDeployments:deploymentStatus.successfulDeployments, FailedDeployments:deploymentStatus.failedDeployments}" \
+            --query "[?contains(name, 'NIST-Remediation') || contains(name, 'MCSB-Remediation')].{Name:name, State:provisioningState, TotalDeployments:deploymentStatus.totalDeployments, SuccessfulDeployments:deploymentStatus.successfulDeployments, FailedDeployments:deploymentStatus.failedDeployments}" \
             -o table
 
   generate-report:
@@ -198,10 +199,11 @@ jobs:
 
       - name: Generate Compliance Report
         run: |
-          # Generate a detailed compliance report
+          # Generate a detailed compliance report for all enforcement frameworks
           REPORT_FILE="compliance-report-$(date +%Y%m%d-%H%M%S).md"
 
-          echo "# NIST 800-53 Compliance Report" > $REPORT_FILE
+          echo "# Security Policy Compliance Report" > $REPORT_FILE
+          echo "Frameworks: NIST 800-53, Microsoft Cloud Security Benchmark (MCSB)" >> $REPORT_FILE
           echo "Generated: $(date)" >> $REPORT_FILE
           echo "" >> $REPORT_FILE
 
@@ -239,16 +241,17 @@ jobs:
       - name: Send Notification
         run: |
           # Create summary for GitHub Actions
-          echo "# NIST 800-53 Auto-Remediation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "# Security Policy Auto-Remediation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "Frameworks: NIST 800-53 & Microsoft Cloud Security Benchmark (MCSB)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           if [ "${{ needs.check-compliance.outputs.should_remediate }}" == "true" ]; then
             echo "✅ **Remediation Triggered**" >> $GITHUB_STEP_SUMMARY
             echo "- Non-compliant resources found: ${{ needs.check-compliance.outputs.non_compliant_count }}" >> $GITHUB_STEP_SUMMARY
-            echo "- Remediation tasks created and executed" >> $GITHUB_STEP_SUMMARY
+            echo "- Remediation tasks created for NIST and MCSB policies" >> $GITHUB_STEP_SUMMARY
           else
             echo "✨ **No Remediation Needed**" >> $GITHUB_STEP_SUMMARY
-            echo "- All resources are compliant" >> $GITHUB_STEP_SUMMARY
+            echo "- All resources are compliant with NIST and MCSB" >> $GITHUB_STEP_SUMMARY
           fi
 
           echo "" >> $GITHUB_STEP_SUMMARY

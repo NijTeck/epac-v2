@@ -1,0 +1,111 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-assignment-schema.json",
+  "nodeName": "/",
+  "scope": {
+    "epac-dev": [
+      "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f"
+    ],
+    "tenant": [
+      "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f"
+    ]
+  },
+  "definitionEntry": {
+    "policySetId": "/providers/Microsoft.Authorization/policySetDefinitions/1f3afdf9-d0c9-4c3d-847f-89da613e70a8",
+    "displayName": "Microsoft cloud security benchmark",
+    "assignment": {
+      "name": "mcsb-enforcement",
+      "displayName": "Microsoft Cloud Security Benchmark (MCSB) - Enforcement Layer",
+      "description": "Microsoft Cloud Security Benchmark provides Azure-native enforcement controls with Deny and DeployIfNotExists effects. MCSB maps to NIST SP 800-53 R5, providing both preventive controls (Deny) and remediation (DeployIfNotExists). This serves as the primary enforcement layer, complementing NIST 800-53 for compliance reporting. Version: 57.54.0. Security contact: esere@lanl.gov",
+      "identity": {
+        "type": "SystemAssigned"
+      }
+    }
+  },
+  "parameters": {
+    // ============================================================
+    // MCSB Effect Configuration
+    // ============================================================
+    // By default, MCSB policies are set to their recommended effects
+    // which include Deny, DeployIfNotExists, Modify, and AuditIfNotExists
+    //
+    // You can override specific policy effects here if needed
+    // Common overrides:
+    // - Change Deny to Audit for testing/gradual rollout
+    // - Change AuditIfNotExists to DeployIfNotExists for enforcement
+    // - Disable specific policies that conflict with business requirements
+    //
+    // To find policy parameter names:
+    // 1. Run: az policy set-definition show --name 1f3afdf9-d0c9-4c3d-847f-89da613e70a8 --query parameters
+    // 2. Look for parameters ending with "Effect" or "effect"
+    //
+    // Example effect overrides (uncomment to use):
+    // "networkWatcherShouldBeEnabledEffect": "DeployIfNotExists",
+    // "sqlServersShouldHaveAuditingEnabledEffect": "DeployIfNotExists",
+    // "storageAccountsShouldRestrictNetworkAccessEffect": "Deny",
+
+    // ============================================================
+    // Defender for Cloud Integration
+    // ============================================================
+    // MCSB is the default policy for Microsoft Defender for Cloud
+    // These settings align with your Defender for Cloud configuration
+
+    // Exclude Defender for Servers (using CrowdStrike instead)
+    // Note: MCSB may reference Defender for Servers in some controls
+    // If any conflicts arise, override those specific policy effects to "Disabled"
+
+    // ============================================================
+    // NIST 800-53 Compliance Mapping
+    // ============================================================
+    // MCSB controls automatically map to NIST 800-53 R5
+    // This assignment provides enforcement for NIST controls through MCSB
+    // while your separate NIST 800-53 assignment provides comprehensive
+    // compliance reporting and audit coverage
+    //
+    // Key MCSB control domains (with NIST mapping):
+    // - Network Security (NS) → NIST SC family
+    // - Identity Management (IM) → NIST IA, AC families
+    // - Privileged Access (PA) → NIST AC family
+    // - Data Protection (DP) → NIST SC family
+    // - Asset Management (AM) → NIST CM family
+    // - Logging and Threat Detection (LT) → NIST AU, SI families
+    // - Incident Response (IR) → NIST IR family
+    // - Posture and Vulnerability Management (PV) → NIST RA, SI families
+    // - Endpoint Security (ES) → NIST SI family
+    // - Backup and Recovery (BR) → NIST CP family
+    // - DevOps Security (DS) → NIST SA, SI families
+    // - Governance and Strategy (GS) → NIST PL, PM families
+
+    // ============================================================
+    // Enforcement Strategy
+    // ============================================================
+    // MCSB provides Azure-specific enforcement that complements NIST:
+    //
+    // 1. Deny Policies: Block non-compliant resource creation
+    //    - Network security (open management ports, public IPs)
+    //    - Storage accounts without encryption
+    //    - Resources without required tags
+    //    - Non-compliant VM SKUs
+    //
+    // 2. DeployIfNotExists: Auto-remediate missing configurations
+    //    - Deploy Defender agents
+    //    - Enable diagnostic logging
+    //    - Configure network security settings
+    //    - Enable encryption at rest
+    //
+    // 3. Modify: Auto-fix resource properties
+    //    - Add required tags
+    //    - Enable security features
+    //    - Configure managed identities
+    //
+    // This creates a defense-in-depth approach:
+    // - MCSB: Prevents/remediates Azure-specific misconfigurations
+    // - NIST: Comprehensive compliance framework coverage
+    // - Custom: Gap-filling for specific requirements
+  },
+  "managedIdentityLocations": {
+    "epac-dev": "eastus",
+    "tenant": "eastus"
+  },
+  "enforcementMode": "Default"
+  // Note: Set to "DoNotEnforce" for testing, then change to "Default" for production
+}
