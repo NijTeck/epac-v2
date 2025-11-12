@@ -71,4 +71,5 @@
     "epac-dev": "eastus",
     "tenant": "eastus"
   }
+  // Trigger deployment with fixed workflow dependencies
 }
