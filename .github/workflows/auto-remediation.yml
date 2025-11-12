@@ -29,6 +29,7 @@ on:
 jobs:
   check-compliance:
     runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'TENANT-DEPLOY-POLICY' }}
     outputs:
       non_compliant_count: ${{ steps.check.outputs.non_compliant_count }}
       should_remediate: ${{ steps.check.outputs.should_remediate }}
@@ -148,6 +149,7 @@ jobs:
     needs: [check-compliance, create-remediation-tasks]
     if: always()
     runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'TENANT-DEPLOY-POLICY' }}
 
     steps:
       - name: Checkout
