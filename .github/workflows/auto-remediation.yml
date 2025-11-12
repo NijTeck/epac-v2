@@ -103,7 +103,8 @@ jobs:
 
           # Create remediation task for each assignment
           for ASSIGNMENT_ID in $ASSIGNMENT_IDS; do
-            ASSIGNMENT_NAME=$(az policy assignment show --id "$ASSIGNMENT_ID" --query "displayName" -o tsv)
+            # Extract assignment name from ID (last part after the last /)
+            ASSIGNMENT_NAME=$(basename "$ASSIGNMENT_ID")
             TASK_NAME="NIST-Remediation-$(date +%Y%m%d-%H%M%S)"
 
             echo ""
