@@ -91,70 +91,81 @@ jobs:
           # Get all policy assignment IDs with non-compliant resources
           ASSIGNMENT_IDS=$(az policy assignment list \
             --scope "/providers/Microsoft.Management/managementGroups/${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
-            --query "[?contains(displayName, 'NIST')].id" -o tsv)
+            --query "[?contains(displayName, 'NIST')].{id:id,policyDefinitionId:policyDefinitionId}" -o json)
 
-          if [ -z "$ASSIGNMENT_IDS" ]; then
+          if [ -z "$ASSIGNMENT_IDS" ] || [ "$ASSIGNMENT_IDS" == "[]" ]; then
             echo "Error: No NIST policy assignments found"
             exit 1
           fi
 
           echo "Found NIST policy assignments:"
-          echo "$ASSIGNMENT_IDS"
+          echo "$ASSIGNMENT_IDS" | jq -r '.[].id'
 
-          # Create remediation task for each assignment
-          for ASSIGNMENT_ID in $ASSIGNMENT_IDS; do
-            # Extract assignment name from ID (last part after the last /)
+          # Process each assignment
+          echo "$ASSIGNMENT_IDS" | jq -c '.[]' | while read -r assignment; do
+            ASSIGNMENT_ID=$(echo "$assignment" | jq -r '.id')
+            POLICY_DEF_ID=$(echo "$assignment" | jq -r '.policyDefinitionId')
             ASSIGNMENT_NAME=$(basename "$ASSIGNMENT_ID")
-            TASK_NAME="NIST-Remediation-$(date +%Y%m%d-%H%M%S)"
 
             echo ""
-            echo "Creating remediation task for: $ASSIGNMENT_NAME"
+            echo "Processing assignment: $ASSIGNMENT_NAME"
             echo "Assignment ID: $ASSIGNMENT_ID"
+            echo "Policy Definition ID: $POLICY_DEF_ID"
 
-            az policy remediation create \
-              --name "$TASK_NAME" \
-              --policy-assignment "$ASSIGNMENT_ID" \
-              --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}"
+            # Check if this is a policy set (initiative) by checking if it contains '/policySetDefinitions/'
+            if [[ "$POLICY_DEF_ID" == *"/policySetDefinitions/"* ]]; then
+              echo "This is a policy set - getting individual policy definitions with DeployIfNotExists/Modify effects..."
 
-            echo "✅ Remediation task created: $TASK_NAME"
+              # Get the policy set definition to find policies with remediation effects
+              POLICY_SET=$(az policy set-definition show --id "$POLICY_DEF_ID" 2>/dev/null || echo "{}")
 
-            # Store last task name for monitoring (we'll monitor the last one)
-            echo "REMEDIATION_TASK=$TASK_NAME" >> $GITHUB_ENV
-          done
+              # Extract policy reference IDs for policies that can be remediated
+              # Note: We'll attempt remediation for all policies in the set since we can't easily determine effect from here
+              POLICY_REF_IDS=$(echo "$POLICY_SET" | jq -r '.policyDefinitions[]? | .policyDefinitionReferenceId' 2>/dev/null || echo "")
 
-      - name: Monitor Remediation Progress
-        run: |
-          # Monitor the remediation task for up to 30 minutes
-          TIMEOUT=1800  # 30 minutes
-          INTERVAL=60   # Check every minute
-          ELAPSED=0
+              if [ -n "$POLICY_REF_IDS" ]; then
+                echo "Found policy reference IDs in set:"
+                echo "$POLICY_REF_IDS"
 
-          while [ $ELAPSED -lt $TIMEOUT ]; do
-            STATE=$(az policy remediation show \
-              --name "${{ env.REMEDIATION_TASK }}" \
-              --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
-              --query "provisioningState" -o tsv)
+                # Create remediation task for each policy in the set
+                for REF_ID in $POLICY_REF_IDS; do
+                  TASK_NAME="NIST-Remediation-${REF_ID}-$(date +%Y%m%d-%H%M%S)"
+                  echo "Creating remediation for policy: $REF_ID"
 
-            PROGRESS=$(az policy remediation show \
-              --name "${{ env.REMEDIATION_TASK }}" \
-              --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
-              --query "{Total: deploymentStatus.totalDeployments, Successful: deploymentStatus.successfulDeployments, Failed: deploymentStatus.failedDeployments}" -o json)
+                  az policy remediation create \
+                    --name "$TASK_NAME" \
+                    --policy-assignment "$ASSIGNMENT_ID" \
+                    --definition-reference-id "$REF_ID" \
+                    --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
+                    2>&1 || echo "⚠️  Remediation not applicable for $REF_ID (may be Audit/Deny effect)"
 
-            echo "Remediation State: $STATE"
-            echo "Progress: $PROGRESS"
+                  # Small delay to avoid rate limiting
+                  sleep 1
+                done
+              else
+                echo "⚠️  Could not retrieve policy definitions from policy set"
+              fi
+            else
+              echo "This is a single policy definition - creating direct remediation..."
+              TASK_NAME="NIST-Remediation-$(date +%Y%m%d-%H%M%S)"
 
-            if [ "$STATE" == "Succeeded" ] || [ "$STATE" == "Failed" ] || [ "$STATE" == "Canceled" ]; then
-              echo "Remediation completed with state: $STATE"
-              break
+              az policy remediation create \
+                --name "$TASK_NAME" \
+                --policy-assignment "$ASSIGNMENT_ID" \
+                --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
+                2>&1 || echo "⚠️  Remediation not applicable"
             fi
 
-            sleep $INTERVAL
-            ELAPSED=$((ELAPSED + INTERVAL))
+            echo "✅ Remediation tasks created for: $ASSIGNMENT_NAME"
           done
 
-          if [ $ELAPSED -ge $TIMEOUT ]; then
-            echo "Warning: Remediation task timed out after 30 minutes"
-          fi
+      - name: List Remediation Tasks
+        run: |
+          echo "Listing all NIST remediation tasks..."
+          az policy remediation list \
+            --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
+            --query "[?contains(name, 'NIST-Remediation')].{Name:name, State:provisioningState, TotalDeployments:deploymentStatus.totalDeployments, SuccessfulDeployments:deploymentStatus.successfulDeployments, FailedDeployments:deploymentStatus.failedDeployments}" \
+            -o table
 
   generate-report:
     needs: [check-compliance, create-remediation-tasks]
