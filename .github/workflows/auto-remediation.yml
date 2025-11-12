@@ -116,8 +116,20 @@ jobs:
             if [[ "$POLICY_DEF_ID" == *"/policySetDefinitions/"* ]]; then
               echo "This is a policy set - getting individual policy definitions with DeployIfNotExists/Modify effects..."
 
-              # Get the policy set definition to find policies with remediation effects
-              POLICY_SET=$(az policy set-definition show --id "$POLICY_DEF_ID" 2>/dev/null || echo "{}")
+              # Extract policy set name from the full resource ID
+              POLICY_SET_NAME=$(basename "$POLICY_DEF_ID")
+              echo "Policy Set Name: $POLICY_SET_NAME"
+
+              # Get the policy set definition - use different parameters for custom vs built-in policy sets
+              if [[ "$POLICY_DEF_ID" == *"/managementGroups/"* ]]; then
+                echo "This is a custom (management group) policy set"
+                POLICY_SET=$(az policy set-definition show \
+                  --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
+                  --name "$POLICY_SET_NAME" 2>/dev/null || echo "{}")
+              else
+                echo "This is a built-in policy set"
+                POLICY_SET=$(az policy set-definition show --name "$POLICY_SET_NAME" 2>/dev/null || echo "{}")
+              fi
 
               # Extract policy reference IDs for policies that can be remediated
               # Note: We'll attempt remediation for all policies in the set since we can't easily determine effect from here
