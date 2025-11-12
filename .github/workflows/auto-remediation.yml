@@ -55,7 +55,7 @@ jobs:
           # Get non-compliant resources count
           NON_COMPLIANT=$(az policy state list \
             --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
-            --filter "complianceState eq 'NonCompliant' and policySetDefinitionName eq 'NIST SP 800-53 Rev. 5'" \
+            --filter "complianceState eq 'NonCompliant'" \
             --query "length(@)" -o tsv)
 
           echo "non_compliant_count=$NON_COMPLIANT" >> $GITHUB_OUTPUT
@@ -88,32 +88,40 @@ jobs:
 
       - name: Create Remediation Tasks
         run: |
-          # Get the policy assignment ID
-          ASSIGNMENT_ID=$(az policy assignment list \
+          # Get all policy assignment IDs with non-compliant resources
+          ASSIGNMENT_IDS=$(az policy assignment list \
             --scope "/providers/Microsoft.Management/managementGroups/${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
-            --query "[?displayName=='NIST SP 800-53 Rev. 5'].id" -o tsv | head -1)
+            --query "[?contains(displayName, 'NIST')].id" -o tsv)
 
-          if [ -z "$ASSIGNMENT_ID" ]; then
-            echo "Error: Policy assignment not found"
+          if [ -z "$ASSIGNMENT_IDS" ]; then
+            echo "Error: No NIST policy assignments found"
             exit 1
           fi
 
-          echo "Creating remediation task for assignment: $ASSIGNMENT_ID"
+          echo "Found NIST policy assignments:"
+          echo "$ASSIGNMENT_IDS"
 
-          # Create remediation task for all non-compliant policies
-          TASK_NAME="NIST-Remediation-$(date +%Y%m%d-%H%M%S)"
+          # Create remediation task for each assignment
+          for ASSIGNMENT_ID in $ASSIGNMENT_IDS; do
+            ASSIGNMENT_NAME=$(az policy assignment show --id "$ASSIGNMENT_ID" --query "displayName" -o tsv)
+            TASK_NAME="NIST-Remediation-$(date +%Y%m%d-%H%M%S)"
 
-          az policy remediation create \
-            --name "$TASK_NAME" \
-            --policy-assignment "$ASSIGNMENT_ID" \
-            --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
-            --resource-discovery-mode ReEvaluateCompliance \
-            --failure-threshold 0.5
+            echo ""
+            echo "Creating remediation task for: $ASSIGNMENT_NAME"
+            echo "Assignment ID: $ASSIGNMENT_ID"
 
-          echo "Remediation task created: $TASK_NAME"
+            az policy remediation create \
+              --name "$TASK_NAME" \
+              --policy-assignment "$ASSIGNMENT_ID" \
+              --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
+              --resource-discovery-mode ReEvaluateCompliance \
+              --failure-threshold 0.5
 
-          # Store task name for monitoring
-          echo "REMEDIATION_TASK=$TASK_NAME" >> $GITHUB_ENV
+            echo "✅ Remediation task created: $TASK_NAME"
+
+            # Store last task name for monitoring (we'll monitor the last one)
+            echo "REMEDIATION_TASK=$TASK_NAME" >> $GITHUB_ENV
+          done
 
       - name: Monitor Remediation Progress
         run: |
@@ -179,7 +187,6 @@ jobs:
           echo "## Overall Compliance" >> $REPORT_FILE
           az policy state summarize \
             --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
-            --query "results[?policySetDefinitionName=='NIST SP 800-53 Rev. 5']" \
             -o table >> $REPORT_FILE
 
           # Get non-compliant resources
@@ -187,7 +194,7 @@ jobs:
           echo "## Non-Compliant Resources" >> $REPORT_FILE
           az policy state list \
             --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
-            --filter "complianceState eq 'NonCompliant' and policySetDefinitionName eq 'NIST SP 800-53 Rev. 5'" \
+            --filter "complianceState eq 'NonCompliant'" \
             --query "[].{Resource:resourceId, Policy:policyDefinitionName, Action:policyDefinitionAction}" \
             -o table >> $REPORT_FILE
 
