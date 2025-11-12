@@ -216,19 +216,23 @@
           "NIST_SP_800-53_R5_AU-6"
         ]
       },
-      {
-        "policyDefinitionReferenceId": "SI-VulnerabilityAssessment",
-        "policyDefinitionId": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f/providers/Microsoft.Authorization/policyDefinitions/custom-si-vulnerability-assessment",
-        "parameters": {
-          "vaType": {
-            "value": "mdeTvm"
-          }
-        },
-        "groupNames": [
-          "NIST_SP_800-53_R5_SI-2",
-          "NIST_SP_800-53_R5_RA-5"
-        ]
-      },
+      // DISABLED: SI-VulnerabilityAssessment
+      // Reason: Requires Defender for Servers which is excluded (using CrowdStrike)
+      // Resource type 'Microsoft.Security/serverVulnerabilityAssessments' not available
+      // Alternative: CrowdStrike provides vulnerability scanning for SI-2 and RA-5 controls
+      // {
+      //   "policyDefinitionReferenceId": "SI-VulnerabilityAssessment",
+      //   "policyDefinitionId": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f/providers/Microsoft.Authorization/policyDefinitions/custom-si-vulnerability-assessment",
+      //   "parameters": {
+      //     "vaType": {
+      //       "value": "mdeTvm"
+      //     }
+      //   },
+      //   "groupNames": [
+      //     "NIST_SP_800-53_R5_SI-2",
+      //     "NIST_SP_800-53_R5_RA-5"
+      //   ]
+      // },
       
       // ============================================================
       // CM - Configuration Management (Custom STIG Policies)
