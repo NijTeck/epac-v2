@@ -50,8 +50,8 @@ jobs:
 
   deployRoles:
     name: Deploy tenant Role Changes
-    needs: plan
-    if: needs.plan.outputs.deployRoleChanges == 'yes' && github.ref == 'refs/heads/main'
+    needs: [plan, deployPolicy]
+    if: needs.plan.outputs.deployRoleChanges == 'yes' && github.ref == 'refs/heads/main' && (success() || needs.deployPolicy.result == 'skipped')
     uses: ./.github/workflows/deploy-roles.yml
     with:
       pacEnvironmentSelector: tenant
