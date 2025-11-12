@@ -13,12 +13,12 @@
     "parameterSelector": "default",
     "definitionEntryList": [
         {
-            "policySetId": "/providers/Microsoft.Authorization/policySetDefinitions/179d1daa-458f-4e47-8086-2a68d0d6c38f",
-            "displayName": "NIST SP 800-53 Rev. 5",
+            "policySetId": "/providers/Microsoft.Authorization/policySetDefinitions/60205a79-6280-4e20-a147-e2011e09dc78",
+            "displayName": "NIST SP 800-53 Rev. 5.1.1",
             "assignment": {
-                "name": "nist-800-53-r5",
-                "displayName": "NIST SP 800-53 Rev. 5 Compliance",
-                "description": "NIST SP 800-53 Rev. 5 compliance framework for Azure resources enforced at Tenant Root Group level.",
+                "name": "nist-800-53-r511",
+                "displayName": "NIST SP 800-53 Rev. 5.1.1 Compliance (Built-in 224 Policies)",
+                "description": "Microsoft's built-in NIST SP 800-53 Rev. 5.1.1 compliance initiative with 224 curated policies. Deployed separately to work alongside custom enforcement policies.",
                 "identity": {
                     "type": "SystemAssigned"
                 }
