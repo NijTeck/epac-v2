@@ -15,10 +15,10 @@ on:
       environment:
         description: 'Environment to remediate'
         required: true
-        default: 'TENANT'
+        default: 'TENANT-DEPLOY-POLICY'
         type: choice
         options:
-          - TENANT
+          - TENANT-DEPLOY-POLICY
           - EPAC-DEV
 
       scope:
