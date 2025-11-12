@@ -1,0 +1,28 @@
+{
+    "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-assignment-schema.json",
+    "nodeName": "/",
+    "scope": {
+        "epac-dev": [
+            "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f"
+        ],
+        "tenant": [
+            "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f"
+        ]
+    },
+    "parameterFile": "nist-800-53-parameters.csv",
+    "parameterSelector": "default",
+    "definitionEntryList": [
+        {
+            "policySetId": "/providers/Microsoft.Authorization/policySetDefinitions/179d1daa-458f-4e47-8086-2a68d0d6c38f",
+            "displayName": "NIST SP 800-53 Rev. 5",
+            "assignment": {
+                "name": "nist-800-53-r5",
+                "displayName": "NIST SP 800-53 Rev. 5 Compliance",
+                "description": "NIST SP 800-53 Rev. 5 compliance framework for Azure resources enforced at Tenant Root Group level.",
+                "identity": {
+                    "type": "SystemAssigned"
+                }
+            }
+        }
+    ]
+}
