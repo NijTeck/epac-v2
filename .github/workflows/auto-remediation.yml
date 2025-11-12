@@ -26,6 +26,10 @@ on:
         required: false
         default: 'e1f3e196-aa55-4709-9c55-0e334c0b444f'
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   check-compliance:
     runs-on: ubuntu-latest
