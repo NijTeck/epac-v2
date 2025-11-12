@@ -114,8 +114,7 @@ jobs:
             az policy remediation create \
               --name "$TASK_NAME" \
               --policy-assignment "$ASSIGNMENT_ID" \
-              --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
-              --resource-discovery-mode ReEvaluateCompliance
+              --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}"
 
             echo "✅ Remediation task created: $TASK_NAME"
 
