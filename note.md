@@ -1,4 +1,4 @@
-    [Preview]: Guest Attestation extension should be installed on supported Linux virtual machines (672fe5a1-2fcd-42d7-b85d-902b6e28c6ff)
+  Microsoft Defender for Azure Cosmos DB should be enabled (adbe85b5-83e6-4350-ab58-bf3a4f736e5e)
 ConvertFrom-Json: /home/runner/.local/share/powershell/Modules/EnterprisePolicyAsCode/10.12.1/internal/functions/Merge-AssignmentParametersEx.ps1:23
 Line |
   23 |  … arameters = ConvertFrom-Json $parametersColumnCell -Depth 100 -AsHash …
@@ -905,23 +905,13 @@ Line |
      |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
      | Conversion from JSON failed with error: Unexpected character encountered
      | while parsing value: A. Path '', line 0, position 0.
-Write-Error: /home/runner/.local/share/powershell/Modules/EnterprisePolicyAsCode/10.12.1/internal/functions/Build-AssignmentDefinitionEntry.ps1:45
+New 'NIST SP 800-53 Rev. 5.1.1 Compliance (Built-in 224 Policies)' at /managementGroups/***
+Write-Error: /home/runner/.local/share/powershell/Modules/EnterprisePolicyAsCode/10.12.1/internal/functions/Build-AssignmentDefinitionNode.ps1:510
 Line |
-  45 |              $policySetId = Confirm-PolicySetDefinitionUsedExists `
-     |                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     |     PolicySet 'comprehensive-nist-800-53-r5' not found.
-InvalidOperation: /home/runner/.local/share/powershell/Modules/EnterprisePolicyAsCode/10.12.1/internal/functions/Build-AssignmentDefinitionEntry.ps1:82
-Line |
-  82 |              $normalizedEntry.displayName = $DefinitionEntry.displayNa …
-     |              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     | The property 'displayName' cannot be found on this object. Verify that
-     | the property exists and can be set.
-InvalidOperation: /home/runner/.local/share/powershell/Modules/EnterprisePolicyAsCode/10.12.1/internal/functions/Build-AssignmentDefinitionEntry.ps1:116
-Line |
- 116 |              $normalizedEntry.assignment = @{
-     |              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     | The property 'assignment' cannot be found on this object. Verify that
-     | the property exists and can be set.
+ 510 |  … asErrors, $assignmentsListAtLeaf = Build-AssignmentDefinitionAtLeaf `
+     |                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |     Leaf Node //: each tree branch must define either a definitionEntry
+     | or a non-empty definitionEntryList.
 Write-Error: /home/runner/.local/share/powershell/Modules/EnterprisePolicyAsCode/10.12.1/functions/Build-DeploymentPlans.ps1:378
 Line |
  378 |          Build-AssignmentPlan `

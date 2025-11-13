@@ -1,8 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(for file in *.disabled)",
-      "Bash(do mv \"$file\" \"$file%.disabled\")"
+      "Bash(or a non-empty definitionEntryList\"\n\nRenamed to .disabled to prevent EPAC from processing it. This file\ncan be re-enabled later when STIG assignments are needed.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []
