@@ -1,0 +1,48 @@
+{
+  "name": "custom-cm-linux-stig-cat1",
+  "properties": {
+    "displayName": "[Custom] Linux systems must meet STIG Category I (Critical) requirements",
+    "policyType": "Custom",
+    "mode": "Indexed",
+    "description": "Ensures Linux VMs meet DISA STIG Category I (High severity) controls for authentication, access control, and system hardening.",
+    "metadata": {
+      "version": "1.0.0",
+      "category": "Guest Configuration",
+      "nistControls": ["CM-6", "CM-2", "CM-7", "AC-2", "AC-3", "IA-5"],
+      "stigCategory": "CAT I",
+      "controlCount": "~25"
+    },
+    "parameters": {
+      "effect": {
+        "type": "String",
+        "defaultValue": "AuditIfNotExists",
+        "allowedValues": ["AuditIfNotExists", "DeployIfNotExists", "Disabled"]
+      }
+    },
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {
+            "field": "type",
+            "equals": "Microsoft.Compute/virtualMachines"
+          },
+          {
+            "field": "Microsoft.Compute/virtualMachines/storageProfile.osDisk.osType",
+            "equals": "Linux"
+          }
+        ]
+      },
+      "then": {
+        "effect": "[parameters('effect')]",
+        "details": {
+          "type": "Microsoft.GuestConfiguration/guestConfigurationAssignments",
+          "name": "LinuxSTIG-CAT1",
+          "existenceCondition": {
+            "field": "Microsoft.GuestConfiguration/guestConfigurationAssignments/complianceStatus",
+            "equals": "Compliant"
+          }
+        }
+      }
+    }
+  }
+}

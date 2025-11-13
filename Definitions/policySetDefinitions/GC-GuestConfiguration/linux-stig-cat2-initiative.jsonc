@@ -1,0 +1,28 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-set-definition-schema.json",
+  "name": "linux-stig-cat2-initiative",
+  "properties": {
+    "displayName": "[EPAC] Linux STIG Category II Compliance",
+    "policyType": "Custom",
+    "description": "Enforces DISA STIG Category II (High Priority) controls for Linux VMs.",
+    "metadata": {
+      "version": "1.0.0",
+      "category": "Guest Configuration"
+    },
+    "policyDefinitions": [
+      {
+        "policyDefinitionReferenceId": "Linux_STIG_CAT2_Controls",
+        "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policyDefinitions/custom-gc-linux-stig-cat2",
+        "parameters": {
+          "effect": { "value": "[parameters(\'effect\')]" }
+        }
+      }
+    ],
+    "parameters": {
+      "effect": {
+        "type": "String",
+        "defaultValue": "AuditIfNotExists"
+      }
+    }
+  }
+}

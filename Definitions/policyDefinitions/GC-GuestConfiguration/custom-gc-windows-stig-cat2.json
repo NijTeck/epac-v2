@@ -1,0 +1,48 @@
+{
+  "name": "custom-cm-windows-stig-cat2",
+  "properties": {
+    "displayName": "[Custom] Windows Server must meet STIG Category II (High Priority) requirements",
+    "policyType": "Custom",
+    "mode": "Indexed",
+    "description": "Ensures Windows VMs meet DISA STIG Category II (Medium severity) controls including password policies, additional user rights, security options, and audit policies.",
+    "metadata": {
+      "version": "1.0.0",
+      "category": "Guest Configuration",
+      "nistControls": ["CM-6", "CM-2", "IA-5", "AC-2", "AU-2", "AU-12"],
+      "stigCategory": "CAT II",
+      "controlCount": 232
+    },
+    "parameters": {
+      "effect": {
+        "type": "String",
+        "defaultValue": "AuditIfNotExists",
+        "allowedValues": ["AuditIfNotExists", "DeployIfNotExists", "Disabled"]
+      }
+    },
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {
+            "field": "type",
+            "equals": "Microsoft.Compute/virtualMachines"
+          },
+          {
+            "field": "Microsoft.Compute/virtualMachines/storageProfile.osDisk.osType",
+            "equals": "Windows"
+          }
+        ]
+      },
+      "then": {
+        "effect": "[parameters(\'effect\')]",
+        "details": {
+          "type": "Microsoft.GuestConfiguration/guestConfigurationAssignments",
+          "name": "WindowsSTIG-CAT2",
+          "existenceCondition": {
+            "field": "Microsoft.GuestConfiguration/guestConfigurationAssignments/complianceStatus",
+            "equals": "Compliant"
+          }
+        }
+      }
+    }
+  }
+}

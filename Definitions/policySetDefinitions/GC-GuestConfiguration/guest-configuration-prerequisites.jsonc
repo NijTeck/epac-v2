@@ -1,0 +1,30 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-set-definition-schema.json",
+  "name": "guest-configuration-prerequisites",
+  "properties": {
+    "displayName": "[EPAC] Guest Configuration Prerequisites",
+    "policyType": "Custom",
+    "description": "This initiative deploys the necessary prerequisites for Guest Configuration, including the VM extension and a system-assigned managed identity.",
+    "metadata": {
+      "version": "1.0.0",
+      "category": "Guest Configuration"
+    },
+    "policyDefinitions": [
+      {
+        "policyDefinitionReferenceId": "AddManagedIdentity",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/3cf2ab00-13f1-4d0c-8971-2ac904541a7e",
+        "parameters": {}
+      },
+      {
+        "policyDefinitionReferenceId": "DeployWindowsGCExtension",
+        "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policyDefinitions/deploy-windows-gc-extension",
+        "parameters": {}
+      },
+      {
+        "policyDefinitionReferenceId": "DeployLinuxGCExtension",
+        "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policyDefinitions/deploy-linux-gc-extension",
+        "parameters": {}
+      }
+    ]
+  }
+}

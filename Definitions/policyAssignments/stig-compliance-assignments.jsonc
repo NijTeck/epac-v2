@@ -1,0 +1,40 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-assignment-schema.json",
+  "nodeName": "/",
+  "scope": {
+    "epac-dev": [
+      "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f"
+    ],
+    "tenant": [
+      "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f"
+    ]
+  },
+  "children": [
+    {
+      "nodeName": "STIG-Compliance",
+      "definitionEntry": {
+        "policySetId": "stig-compliance-suite",
+        "displayName": "[EPAC] STIG Compliance Suite for Windows and Linux"
+      },
+      "assignment": {
+        "name": "stig-compliance-assignment",
+        "displayName": "STIG Compliance for All VMs",
+        "description": "Assigns the comprehensive STIG compliance suite to all virtual machines. Includes DISA STIG CAT I and CAT II controls with automated Guest Configuration extension deployment.",
+        "identity": {
+          "type": "SystemAssigned"
+        }
+      },
+      "parameters": {
+        "windowsCat1Effect": "AuditIfNotExists",
+        "windowsCat2Effect": "AuditIfNotExists",
+        "linuxCat1Effect": "AuditIfNotExists",
+        "linuxCat2Effect": "AuditIfNotExists"
+      },
+      "managedIdentityLocations": {
+        "epac-dev": "eastus",
+        "tenant": "eastus"
+      },
+      "enforcementMode": "Default"
+    }
+  ]
+}

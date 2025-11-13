@@ -1,0 +1,53 @@
+{
+  "name": "custom-cm-windows-stig-cat1",
+  "properties": {
+    "displayName": "[Custom] Windows Server must meet STIG Category I (Critical) requirements",
+    "policyType": "Custom",
+    "mode": "Indexed",
+    "description": "Ensures Windows VMs meet DISA STIG Category I (High severity) controls including authentication, access control, and system hardening.",
+    "metadata": {
+      "version": "1.0.0",
+      "category": "Guest Configuration",
+      "nistControls": ["CM-6", "CM-2", "CM-7", "AC-2", "AC-3", "IA-5"],
+      "stigCategory": "CAT I",
+      "controlCount": 31
+    },
+    "parameters": {
+      "effect": {
+        "type": "String",
+        "defaultValue": "AuditIfNotExists",
+        "allowedValues": ["AuditIfNotExists", "DeployIfNotExists", "Disabled"]
+      },
+      "IncludeArcMachines": {
+        "type": "String",
+        "defaultValue": "false",
+        "allowedValues": ["true", "false"]
+      }
+    },
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {
+            "field": "type",
+            "equals": "Microsoft.Compute/virtualMachines"
+          },
+          {
+            "field": "Microsoft.Compute/virtualMachines/storageProfile.osDisk.osType",
+            "equals": "Windows"
+          }
+        ]
+      },
+      "then": {
+        "effect": "[parameters(\'effect\')]",
+        "details": {
+          "type": "Microsoft.GuestConfiguration/guestConfigurationAssignments",
+          "name": "WindowsSTIG-CAT1",
+          "existenceCondition": {
+            "field": "Microsoft.GuestConfiguration/guestConfigurationAssignments/complianceStatus",
+            "equals": "Compliant"
+          }
+        }
+      }
+    }
+  }
+}

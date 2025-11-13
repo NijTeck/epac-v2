@@ -1,0 +1,66 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-set-definition-schema.json",
+  "name": "stig-compliance-suite",
+  "properties": {
+    "displayName": "[EPAC] STIG Compliance Suite for Windows and Linux",
+    "policyType": "Custom",
+    "description": "This initiative bundles all policies required for DISA STIG compliance, including prerequisites, Category 1, and Category 2 controls for both Windows and Linux.",
+    "metadata": {
+      "version": "1.0.0",
+      "category": "Guest Configuration"
+    },
+    "policyDefinitions": [
+      {
+        "policyDefinitionReferenceId": "Prerequisites",
+        "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policySetDefinitions/guest-configuration-prerequisites",
+        "parameters": {}
+      },
+      {
+        "policyDefinitionReferenceId": "Windows_STIG_CAT1",
+        "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policySetDefinitions/windows-stig-cat1-initiative",
+        "parameters": {
+          "effect": { "value": "[parameters(\'windowsCat1Effect\')]" }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "Windows_STIG_CAT2",
+        "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policySetDefinitions/windows-stig-cat2-initiative",
+        "parameters": {
+          "effect": { "value": "[parameters(\'windowsCat2Effect\')]" }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "Linux_STIG_CAT1",
+        "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policySetDefinitions/linux-stig-cat1-initiative",
+        "parameters": {
+          "effect": { "value": "[parameters(\'linuxCat1Effect\')]" }
+        }
+      },
+      {
+        "policyDefinitionReferenceId": "Linux_STIG_CAT2",
+        "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policySetDefinitions/linux-stig-cat2-initiative",
+        "parameters": {
+          "effect": { "value": "[parameters(\'linuxCat2Effect\')]" }
+        }
+      }
+    ],
+    "parameters": {
+      "windowsCat1Effect": {
+        "type": "String",
+        "defaultValue": "AuditIfNotExists"
+      },
+      "windowsCat2Effect": {
+        "type": "String",
+        "defaultValue": "AuditIfNotExists"
+      },
+      "linuxCat1Effect": {
+        "type": "String",
+        "defaultValue": "AuditIfNotExists"
+      },
+      "linuxCat2Effect": {
+        "type": "String",
+        "defaultValue": "AuditIfNotExists"
+      }
+    }
+  }
+}
