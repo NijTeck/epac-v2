@@ -41,13 +41,8 @@
     "enableDefenderForResourceManager": "true",
     "enableDefenderForDns": "true",
     "enableDefenderForOpenSourceDatabases": "true",
-    "enableDefenderForCosmosDbs": "true",
-    
-    // ============================================================
-    // STIG Compliance
-    // ============================================================
-    "includeArcMachinesForStig": "false"
-    
+    "enableDefenderForCosmosDbs": "true"
+
     // ============================================================
     // Policy Effect Overrides
     // ============================================================

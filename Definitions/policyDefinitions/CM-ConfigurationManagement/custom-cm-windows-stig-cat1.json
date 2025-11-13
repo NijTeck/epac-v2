@@ -17,11 +17,6 @@
         "type": "String",
         "defaultValue": "AuditIfNotExists",
         "allowedValues": ["AuditIfNotExists", "DeployIfNotExists", "Disabled"]
-      },
-      "IncludeArcMachines": {
-        "type": "String",
-        "defaultValue": "false",
-        "allowedValues": ["true", "false"]
       }
     },
     "policyRule": {

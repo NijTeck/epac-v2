@@ -130,17 +130,6 @@
         },
         "allowedValues": ["true", "false"],
         "defaultValue": "true"
-      },
-      
-      // STIG Compliance Parameters
-      "includeArcMachinesForStig": {
-        "type": "String",
-        "metadata": {
-          "displayName": "Include Arc Machines for STIG Compliance",
-          "description": "Include Azure Arc connected servers in STIG compliance checks"
-        },
-        "allowedValues": ["true", "false"],
-        "defaultValue": "false"
       }
     },
     "policyDefinitions": [
@@ -241,9 +230,6 @@
         "policyDefinitionReferenceId": "CM-WindowsSTIGComplianceCAT1",
         "policyDefinitionId": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f/providers/Microsoft.Authorization/policyDefinitions/custom-cm-windows-stig-cat1",
         "parameters": {
-          "IncludeArcMachines": {
-            "value": "[parameters('includeArcMachinesForStig')]"
-          },
           "effect": {
             "value": "AuditIfNotExists"
           }
@@ -258,9 +244,6 @@
         "policyDefinitionReferenceId": "CM-WindowsSTIGComplianceCAT2",
         "policyDefinitionId": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f/providers/Microsoft.Authorization/policyDefinitions/custom-cm-windows-stig-cat2",
         "parameters": {
-          "IncludeArcMachines": {
-            "value": "[parameters('includeArcMachinesForStig')]"
-          },
           "effect": {
             "value": "AuditIfNotExists"
           }
@@ -275,9 +258,6 @@
         "policyDefinitionReferenceId": "CM-LinuxSTIGComplianceCAT1",
         "policyDefinitionId": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f/providers/Microsoft.Authorization/policyDefinitions/custom-cm-linux-stig-cat1",
         "parameters": {
-          "IncludeArcMachines": {
-            "value": "[parameters('includeArcMachinesForStig')]"
-          },
           "effect": {
             "value": "AuditIfNotExists"
           }
@@ -292,9 +272,6 @@
         "policyDefinitionReferenceId": "CM-LinuxSTIGComplianceCAT2",
         "policyDefinitionId": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f/providers/Microsoft.Authorization/policyDefinitions/custom-cm-linux-stig-cat2",
         "parameters": {
-          "IncludeArcMachines": {
-            "value": "[parameters('includeArcMachinesForStig')]"
-          },
           "effect": {
             "value": "AuditIfNotExists"
           }
