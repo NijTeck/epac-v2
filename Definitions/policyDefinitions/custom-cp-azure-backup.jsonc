@@ -49,21 +49,10 @@
             "then": {
                 "effect": "[parameters('effect')]",
                 "details": {
-                    "type": "Microsoft.RecoveryServices/backupprotecteditems",
+                    "type": "Microsoft.RecoveryServices/backupProtectedItems",
                     "existenceCondition": {
-                        "allOf": [
-                            {
-                                "field": "Microsoft.RecoveryServices/backupprotecteditems/backupManagementType",
-                                "equals": "AzureIaasVM"
-                            },
-                            {
-                                "field": "Microsoft.RecoveryServices/backupprotecteditems/protectionState",
-                                "in": [
-                                    "Protected",
-                                    "ProtectionStopped"
-                                ]
-                            }
-                        ]
+                        "field": "Microsoft.RecoveryServices/backupProtectedItems/policyId",
+                        "notEquals": ""
                     }
                 }
             }
