@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(where.exe python python3 py)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
