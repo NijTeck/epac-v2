@@ -1,0 +1,328 @@
+# NIST 800-53 EPAC GitLab CI/CD Pipeline
+# Equivalent to GitHub Actions workflows for GitLab deployment
+
+variables:
+  PAC_OUTPUT_FOLDER: "./Output"
+  PAC_DEFINITIONS_FOLDER: "./Definitions"
+  # Azure connection uses OIDC with Workload Identity Federation
+  AZURE_TENANT_ID: "${AZURE_TENANT_ID}"
+  AZURE_CLIENT_ID: "${AZURE_CLIENT_ID}"
+  AZURE_SUBSCRIPTION_ID: "${AZURE_SUBSCRIPTION_ID}"
+
+# Define stages
+stages:
+  - plan
+  - deploy
+  - remediate
+
+# Global settings
+workflow:
+  rules:
+    # Run on main branch push
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"
+      changes:
+        - Definitions/**/*
+    # Run on merge request
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - Definitions/**/*
+    # Allow manual pipeline runs
+    - if: $CI_PIPELINE_SOURCE == "web"
+
+# Image with PowerShell and Azure CLI pre-installed
+default:
+  image: mcr.microsoft.com/azure-powershell:latest
+  before_script:
+    # Install Azure CLI if not present
+    - |
+      if ! command -v az &> /dev/null; then
+        curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+      fi
+
+#==============================================================================
+# PLAN STAGE: Build deployment plan
+#==============================================================================
+plan:tenant:
+  stage: plan
+  environment:
+    name: TENANT-PLAN
+  script:
+    # Install EPAC PowerShell module
+    - pwsh -Command "Install-Module EnterprisePolicyAsCode -Force -Scope CurrentUser"
+
+    # Login to Azure using OIDC (Workload Identity Federation)
+    - |
+      az login --service-principal \
+        -u $AZURE_CLIENT_ID \
+        -t $AZURE_TENANT_ID \
+        --federated-token $CI_JOB_JWT_V2 \
+        --allow-no-subscriptions
+
+    # Build deployment plan
+    - pwsh -Command "Build-DeploymentPlans -PacEnvironmentSelector tenant -InformationAction Continue"
+
+    # Check if plan was created
+    - |
+      if [ -d "$PAC_OUTPUT_FOLDER" ]; then
+        echo "DEPLOY_POLICY_CHANGES=yes" >> plan.env
+        if [ -f "$PAC_OUTPUT_FOLDER/roles-plan.json" ]; then
+          echo "DEPLOY_ROLE_CHANGES=yes" >> plan.env
+        fi
+      else
+        echo "DEPLOY_POLICY_CHANGES=no" >> plan.env
+        echo "DEPLOY_ROLE_CHANGES=no" >> plan.env
+        echo "Plan not found. Nothing to deploy."
+      fi
+
+  artifacts:
+    paths:
+      - $PAC_OUTPUT_FOLDER/
+    reports:
+      dotenv: plan.env
+    expire_in: 1 hour
+    when: always
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_PIPELINE_SOURCE == "merge_request_event"
+
+#==============================================================================
+# DEPLOY STAGE: Deploy policies and roles
+#==============================================================================
+deploy:policy:
+  stage: deploy
+  environment:
+    name: TENANT-DEPLOY-POLICY
+  dependencies:
+    - plan:tenant
+  needs:
+    - job: plan:tenant
+      artifacts: true
+  script:
+    # Install EPAC PowerShell module
+    - pwsh -Command "Install-Module EnterprisePolicyAsCode -Force -Scope CurrentUser"
+
+    # Login to Azure using OIDC
+    - |
+      az login --service-principal \
+        -u $AZURE_CLIENT_ID \
+        -t $AZURE_TENANT_ID \
+        --federated-token $CI_JOB_JWT_V2 \
+        --allow-no-subscriptions
+
+    # Deploy policy plan
+    - pwsh -Command "Deploy-PolicyPlan -PacEnvironmentSelector tenant -InformationAction Continue"
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      variables:
+        DEPLOY_POLICY_CHANGES: "yes"
+      when: on_success
+
+deploy:roles:
+  stage: deploy
+  environment:
+    name: TENANT-DEPLOY-ROLES
+  dependencies:
+    - plan:tenant
+  needs:
+    - job: plan:tenant
+      artifacts: true
+    - job: deploy:policy
+      optional: true
+  script:
+    # Install EPAC PowerShell module
+    - pwsh -Command "Install-Module EnterprisePolicyAsCode -Force -Scope CurrentUser"
+
+    # Login to Azure using OIDC
+    - |
+      az login --service-principal \
+        -u $AZURE_CLIENT_ID \
+        -t $AZURE_TENANT_ID \
+        --federated-token $CI_JOB_JWT_V2 \
+        --allow-no-subscriptions
+
+    # Deploy role plan
+    - pwsh -Command "Deploy-RolesPlan -PacEnvironmentSelector tenant -InformationAction Continue"
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      variables:
+        DEPLOY_ROLE_CHANGES: "yes"
+      when: on_success
+
+#==============================================================================
+# REMEDIATE STAGE: Auto-remediation after successful deployment
+#==============================================================================
+remediate:check-compliance:
+  stage: remediate
+  environment:
+    name: TENANT-DEPLOY-POLICY
+  needs:
+    - job: deploy:policy
+      optional: false
+  script:
+    # Login to Azure
+    - |
+      az login --service-principal \
+        -u $AZURE_CLIENT_ID \
+        -t $AZURE_TENANT_ID \
+        --federated-token $CI_JOB_JWT_V2 \
+        --allow-no-subscriptions
+
+    # Check compliance state
+    - |
+      MANAGEMENT_GROUP_ID="${MANAGEMENT_GROUP_ID:-e1f3e196-aa55-4709-9c55-0e334c0b444f}"
+
+      NON_COMPLIANT=$(az policy state list \
+        --management-group "$MANAGEMENT_GROUP_ID" \
+        --filter "complianceState eq 'NonCompliant'" \
+        --query "length(@)" -o tsv)
+
+      echo "Found $NON_COMPLIANT non-compliant resources"
+      echo "NON_COMPLIANT_COUNT=$NON_COMPLIANT" >> remediation.env
+
+      if [ "$NON_COMPLIANT" -gt 0 ]; then
+        echo "SHOULD_REMEDIATE=true" >> remediation.env
+      else
+        echo "SHOULD_REMEDIATE=false" >> remediation.env
+      fi
+
+  artifacts:
+    reports:
+      dotenv: remediation.env
+    expire_in: 1 hour
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: on_success
+  allow_failure: true
+
+remediate:create-tasks:
+  stage: remediate
+  environment:
+    name: TENANT-DEPLOY-POLICY
+  needs:
+    - job: remediate:check-compliance
+      artifacts: true
+  script:
+    # Login to Azure
+    - |
+      az login --service-principal \
+        -u $AZURE_CLIENT_ID \
+        -t $AZURE_TENANT_ID \
+        --federated-token $CI_JOB_JWT_V2 \
+        --allow-no-subscriptions
+
+    # Create remediation tasks
+    - |
+      MANAGEMENT_GROUP_ID="${MANAGEMENT_GROUP_ID:-e1f3e196-aa55-4709-9c55-0e334c0b444f}"
+
+      echo "Creating remediation tasks for NIST 800-53 and MCSB policies..."
+
+      # Get all policy assignment IDs for enforcement frameworks
+      ASSIGNMENT_IDS=$(az policy assignment list \
+        --scope "/providers/Microsoft.Management/managementGroups/$MANAGEMENT_GROUP_ID" \
+        --query "[?contains(displayName, 'NIST') || contains(displayName, 'Microsoft cloud security benchmark') || contains(displayName, 'MCSB')].{id:id,policyDefinitionId:policyDefinitionId}" -o json)
+
+      if [ -z "$ASSIGNMENT_IDS" ] || [ "$ASSIGNMENT_IDS" == "[]" ]; then
+        echo "Error: No enforcement policy assignments found (NIST, MCSB)"
+        exit 1
+      fi
+
+      echo "Found enforcement policy assignments:"
+      echo "$ASSIGNMENT_IDS" | python3 -m json.tool
+
+      # Process each assignment
+      echo "$ASSIGNMENT_IDS" | python3 -c "
+      import sys, json
+      assignments = json.load(sys.stdin)
+      for assignment in assignments:
+          print(assignment['id'])
+      " | while read -r ASSIGNMENT_ID; do
+        ASSIGNMENT_NAME=$(basename "$ASSIGNMENT_ID")
+
+        echo ""
+        echo "Processing assignment: $ASSIGNMENT_NAME"
+
+        # Get policy definition ID
+        POLICY_DEF_ID=$(echo "$ASSIGNMENT_IDS" | python3 -c "
+        import sys, json
+        assignments = json.load(sys.stdin)
+        for assignment in assignments:
+            if assignment['id'] == '$ASSIGNMENT_ID':
+                print(assignment['policyDefinitionId'])
+                break
+        ")
+
+        # Check if this is a policy set
+        if [[ "$POLICY_DEF_ID" == *"/policySetDefinitions/"* ]]; then
+          echo "This is a policy set - getting individual policy definitions..."
+
+          POLICY_SET_NAME=$(basename "$POLICY_DEF_ID")
+
+          # Get policy set definition
+          if [[ "$POLICY_DEF_ID" == *"/managementGroups/"* ]]; then
+            POLICY_SET=$(az policy set-definition show \
+              --management-group "$MANAGEMENT_GROUP_ID" \
+              --name "$POLICY_SET_NAME" 2>/dev/null || echo "{}")
+          else
+            POLICY_SET=$(az policy set-definition show --name "$POLICY_SET_NAME" 2>/dev/null || echo "{}")
+          fi
+
+          # Extract policy reference IDs
+          POLICY_REF_IDS=$(echo "$POLICY_SET" | python3 -c "
+          import sys, json
+          try:
+              policy_set = json.load(sys.stdin)
+              ref_ids = [p.get('policyDefinitionReferenceId', '') for p in policy_set.get('policyDefinitions', [])]
+              for ref_id in ref_ids:
+                  if ref_id:
+                      print(ref_id)
+          except:
+              pass
+          ")
+
+          if [ -n "$POLICY_REF_IDS" ]; then
+            echo "Found policy reference IDs in set"
+
+            # Create remediation task for each policy in the set
+            for REF_ID in $POLICY_REF_IDS; do
+              TASK_NAME="NIST-Remediation-${REF_ID}-$(date +%Y%m%d-%H%M%S)"
+              echo "Creating remediation for policy: $REF_ID"
+
+              az policy remediation create \
+                --name "$TASK_NAME" \
+                --policy-assignment "$ASSIGNMENT_ID" \
+                --definition-reference-id "$REF_ID" \
+                --management-group "$MANAGEMENT_GROUP_ID" \
+                2>&1 || echo "⚠️  Remediation not applicable for $REF_ID"
+
+              sleep 1
+            done
+          fi
+        else
+          echo "This is a single policy definition - creating direct remediation..."
+          TASK_NAME="NIST-Remediation-$(date +%Y%m%d-%H%M%S)"
+
+          az policy remediation create \
+            --name "$TASK_NAME" \
+            --policy-assignment "$ASSIGNMENT_ID" \
+            --management-group "$MANAGEMENT_GROUP_ID" \
+            2>&1 || echo "⚠️  Remediation not applicable"
+        fi
+
+        echo "✅ Remediation tasks created for: $ASSIGNMENT_NAME"
+      done
+
+      # List remediation tasks
+      echo ""
+      echo "Listing all remediation tasks..."
+      az policy remediation list \
+        --management-group "$MANAGEMENT_GROUP_ID" \
+        --query "[?contains(name, 'NIST-Remediation') || contains(name, 'MCSB-Remediation')].{Name:name, State:provisioningState, TotalDeployments:deploymentStatus.totalDeployments, SuccessfulDeployments:deploymentStatus.successfulDeployments, FailedDeployments:deploymentStatus.failedDeployments}" \
+        -o table
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      variables:
+        SHOULD_REMEDIATE: "true"
+      when: on_success
+  allow_failure: true
