@@ -10,30 +10,32 @@
     ]
   },
   "children": [
-    {
-      "nodeName": "Comprehensive-NIST-800-53",
-      "definitionEntry": {
-        "policySetId": "comprehensive-nist-800-53-r5",
-        "displayName": "Comprehensive NIST SP 800-53 R5.1.1 with Custom Enforcement Policies"
-      },
-      "assignment": {
-        "name": "nist-800-53-assignment",
-        "displayName": "NIST 800-53 R5 Compliance (includes STIG)",
-        "description": "Complete NIST 800-53 R5.1.1 compliance framework including DISA STIG CAT I and CAT II controls, Defender for Cloud plans, and security contact configuration.",
-        "identity": {
-          "type": "SystemAssigned"
-        }
-      },
-      "parameters": {
-        "securityContactEmail": "esere@lanl.gov",
-        "securityContactPhone": "",
-        "includeArcMachinesForStig": "false"
-      },
-      "managedIdentityLocations": {
-        "epac-dev": "eastus",
-        "tenant": "eastus"
-      },
-      "enforcementMode": "Default"
-    }
+    // TEMPORARILY DISABLED: Assignment removed to allow policy definitions to deploy first
+    // Will be re-enabled after custom STIG policies and comprehensive NIST policy set exist in Azure
+    // {
+    //   "nodeName": "Comprehensive-NIST-800-53",
+    //   "definitionEntry": {
+    //     "policySetId": "comprehensive-nist-800-53-r5",
+    //     "displayName": "Comprehensive NIST SP 800-53 R5.1.1 with Custom Enforcement Policies"
+    //   },
+    //   "assignment": {
+    //     "name": "nist-800-53-assignment",
+    //     "displayName": "NIST 800-53 R5 Compliance (includes STIG)",
+    //     "description": "Complete NIST 800-53 R5.1.1 compliance framework including DISA STIG CAT I and CAT II controls, Defender for Cloud plans, and security contact configuration.",
+    //     "identity": {
+    //       "type": "SystemAssigned"
+    //     }
+    //   },
+    //   "parameters": {
+    //     "securityContactEmail": "esere@lanl.gov",
+    //     "securityContactPhone": "",
+    //     "includeArcMachinesForStig": "false"
+    //   },
+    //   "managedIdentityLocations": {
+    //     "epac-dev": "eastus",
+    //     "tenant": "eastus"
+    //   },
+    //   "enforcementMode": "Default"
+    // }
   ]
 }
