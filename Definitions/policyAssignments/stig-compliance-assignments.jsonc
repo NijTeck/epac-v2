@@ -11,24 +11,23 @@
   },
   "children": [
     {
-      "nodeName": "STIG-Compliance",
+      "nodeName": "Comprehensive-NIST-800-53",
       "definitionEntry": {
-        "policySetId": "stig-compliance-suite",
-        "displayName": "[EPAC] STIG Compliance Suite for Windows and Linux"
+        "policySetId": "comprehensive-nist-800-53-r5",
+        "displayName": "Comprehensive NIST SP 800-53 R5.1.1 with Custom Enforcement Policies"
       },
       "assignment": {
-        "name": "stig-compliance-assignment",
-        "displayName": "STIG Compliance for All VMs",
-        "description": "Assigns the comprehensive STIG compliance suite to all virtual machines. Includes DISA STIG CAT I and CAT II controls with automated Guest Configuration extension deployment.",
+        "name": "nist-800-53-assignment",
+        "displayName": "NIST 800-53 R5 Compliance (includes STIG)",
+        "description": "Complete NIST 800-53 R5.1.1 compliance framework including DISA STIG CAT I and CAT II controls, Defender for Cloud plans, and security contact configuration.",
         "identity": {
           "type": "SystemAssigned"
         }
       },
       "parameters": {
-        "windowsCat1Effect": "AuditIfNotExists",
-        "windowsCat2Effect": "AuditIfNotExists",
-        "linuxCat1Effect": "AuditIfNotExists",
-        "linuxCat2Effect": "AuditIfNotExists"
+        "securityContactEmail": "esere@lanl.gov",
+        "securityContactPhone": "",
+        "includeArcMachinesForStig": "false"
       },
       "managedIdentityLocations": {
         "epac-dev": "eastus",
