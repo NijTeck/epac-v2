@@ -5,7 +5,21 @@
       "Bash(cat:*)",
       "Bash(git rm:*)",
       "Bash(gh run list:*)",
-      "Bash(gh run view:*)"
+      "Bash(gh run view:*)",
+      "Bash(gh workflow run:*)",
+      "Bash(awk:*)",
+      "Bash(python3:*)",
+      "Bash(gh run watch:*)",
+      "Bash(az policy assignment list:*)",
+      "Bash(az policy state:*)",
+      "Bash(az policy assignment show:*)",
+      "Bash(az policy definition show:*)",
+      "Bash(az policy remediation create:*)",
+      "Bash(az policy remediation:*)",
+      "Bash(az vm show:*)",
+      "Bash(az account set:*)",
+      "Bash(az vm get-instance-view:*)",
+      "Bash(az vm extension list:*)"
     ],
     "deny": [],
     "ask": []

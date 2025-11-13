@@ -12,7 +12,7 @@
     "policyDefinitions": [
       {
         "policyDefinitionReferenceId": "Linux_STIG_CAT1_Controls",
-        "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policyDefinitions/custom-gc-linux-stig-cat1",
+        "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policyDefinitions/custom-cm-linux-stig-cat1",
         "parameters": {
           "effect": { "value": "[parameters(\'effect\')]" }
         }
