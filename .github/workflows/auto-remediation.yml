@@ -32,6 +32,8 @@ permissions:
 
 jobs:
   check-compliance:
+    # Only run if EPAC workflow succeeded, or if manually triggered
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environment || 'TENANT-DEPLOY-POLICY' }}
     outputs:
