@@ -17,30 +17,34 @@
       },
       {
         "policyDefinitionReferenceId": "Windows_STIG_CAT1",
-        "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policySetDefinitions/windows-stig-cat1-initiative",
+        "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policyDefinitions/custom-cm-windows-stig-cat1",
         "parameters": {
-          "effect": { "value": "[parameters(\'windowsCat1Effect\')]" }
+          "effect": { "value": "[parameters(\'windowsCat1Effect\')]" },
+          "IncludeArcMachines": { "value": "false" }
         }
       },
       {
         "policyDefinitionReferenceId": "Windows_STIG_CAT2",
-        "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policySetDefinitions/windows-stig-cat2-initiative",
+        "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policyDefinitions/custom-cm-windows-stig-cat2",
         "parameters": {
-          "effect": { "value": "[parameters(\'windowsCat2Effect\')]" }
+          "effect": { "value": "[parameters(\'windowsCat2Effect\')]" },
+          "IncludeArcMachines": { "value": "false" }
         }
       },
       {
         "policyDefinitionReferenceId": "Linux_STIG_CAT1",
-        "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policySetDefinitions/linux-stig-cat1-initiative",
+        "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policyDefinitions/custom-cm-linux-stig-cat1",
         "parameters": {
-          "effect": { "value": "[parameters(\'linuxCat1Effect\')]" }
+          "effect": { "value": "[parameters(\'linuxCat1Effect\')]" },
+          "IncludeArcMachines": { "value": "false" }
         }
       },
       {
         "policyDefinitionReferenceId": "Linux_STIG_CAT2",
-        "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policySetDefinitions/linux-stig-cat2-initiative",
+        "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policyDefinitions/custom-cm-linux-stig-cat2",
         "parameters": {
-          "effect": { "value": "[parameters(\'linuxCat2Effect\')]" }
+          "effect": { "value": "[parameters(\'linuxCat2Effect\')]" },
+          "IncludeArcMachines": { "value": "false" }
         }
       }
     ],
