@@ -3,5 +3,6 @@ site/
 
 # Backup and temporary files
 *.backup
+*_backup_*.xlsx
 *.updated.csv
 nist-800-53-recommendations.csv
