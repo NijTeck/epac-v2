@@ -23,7 +23,11 @@
       "Bash(if [ -f \"Definitions/policyAssignments/stig-compliance-assignments.jsonc.disabled\" ])",
       "Bash(then mv \"Definitions/policyAssignments/stig-compliance-assignments.jsonc.disabled\" \"Definitions/policyAssignments/stig-compliance-assignments.jsonc\")",
       "Bash(else echo \"File not found\")",
-      "Bash(fi)"
+      "Bash(fi)",
+      "Bash(for file in *.jsonc)",
+      "Bash(do mv \"$file\" \"$file.disabled\")",
+      "Bash(echo:*)",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []
