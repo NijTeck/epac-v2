@@ -3,10 +3,10 @@
   "nodeName": "/",
   "scope": {
     "epac-dev": [
-      "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f"
+      "/providers/Microsoft.Management/managementGroups/11111111111111111111111111111111111111111"
     ],
     "tenant": [
-      "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f"
+      "/providers/Microsoft.Management/managementGroups/11111111111111111111111111111111111111111"
     ]
   },
   "exemptions": [
@@ -16,7 +16,7 @@
       "description": "Exemption for Microsoft Defender for Servers requirement. Organization uses CrowdStrike for endpoint protection to satisfy NIST 800-53 SI-3 (Malicious Code Protection) and SI-4 (System Monitoring) controls.",
       "exemptionCategory": "Mitigated",
       "expiresOn": "2025-12-31",
-      "policyAssignmentId": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f/providers/Microsoft.Authorization/policyAssignments/nist-800-53-r5-comprehensive",
+      "policyAssignmentId": "/providers/Microsoft.Management/managementGroups/11111111111111111111111111111111111111111/providers/Microsoft.Authorization/policyAssignments/nist-800-53-r5-comprehensive",
       "policyDefinitionReferenceIds": [
         "SI-DefenderPlansDeployment"
       ],

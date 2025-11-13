@@ -196,7 +196,7 @@ gh workflow run "EPAC Dev Workflow" --ref working-nist800-controls
 ```bash
 # Check for blocked resources
 az policy state list \
-  --management-group "e1f3e196-aa55-4709-9c55-0e334c0b444f" \
+  --management-group "11111111111111111111111111111111111111111" \
   --filter "complianceState eq 'NonCompliant' and policyDefinitionAction eq 'deny'"
 ```
 

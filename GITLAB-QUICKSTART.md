@@ -7,7 +7,7 @@ Use this checklist to quickly set up GitLab CI/CD for EPAC NIST 800-53 deploymen
 - [ ] Azure subscription with appropriate permissions
 - [ ] GitLab account (GitLab.com or self-hosted)
 - [ ] Azure CLI installed
-- [ ] Management Group ID: `e1f3e196-aa55-4709-9c55-0e334c0b444f`
+- [ ] Management Group ID: `11111111111111111111111111111111111111111`
 
 ---
 
@@ -33,7 +33,7 @@ echo "AZURE_CLIENT_ID: $AZURE_CLIENT_ID"
 ### Step 2: Assign Permissions
 
 ```bash
-MANAGEMENT_GROUP_ID="e1f3e196-aa55-4709-9c55-0e334c0b444f"
+MANAGEMENT_GROUP_ID="11111111111111111111111111111111111111111"
 
 az role assignment create --assignee $AZURE_CLIENT_ID --role "Resource Policy Contributor" --scope "/providers/Microsoft.Management/managementGroups/$MANAGEMENT_GROUP_ID"
 az role assignment create --assignee $AZURE_CLIENT_ID --role "User Access Administrator" --scope "/providers/Microsoft.Management/managementGroups/$MANAGEMENT_GROUP_ID"
@@ -84,7 +84,7 @@ Add these variables (all **Protected** ✓ and **Masked** ✓):
 - [ ] `AZURE_TENANT_ID` = `<from Step 1>`
 - [ ] `AZURE_CLIENT_ID` = `<from Step 1>`
 - [ ] `AZURE_SUBSCRIPTION_ID` = `<your-subscription-id>`
-- [ ] `MANAGEMENT_GROUP_ID` = `e1f3e196-aa55-4709-9c55-0e334c0b444f`
+- [ ] `MANAGEMENT_GROUP_ID` = `11111111111111111111111111111111111111111`
 
 ### Step 5: Create Environments
 
@@ -143,7 +143,7 @@ git push origin main
 
 ```bash
 az policy assignment list \
-  --management-group "e1f3e196-aa55-4709-9c55-0e334c0b444f" \
+  --management-group "11111111111111111111111111111111111111111" \
   --query "[?contains(displayName, 'NIST')].{Name:displayName,ID:id}" \
   -o table
 ```

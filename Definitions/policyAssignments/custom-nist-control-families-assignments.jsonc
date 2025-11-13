@@ -3,10 +3,10 @@
     "nodeName": "/Custom-Control-Families/",
     "scope": {
         "epac-dev": [
-            "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f"
+            "/providers/Microsoft.Management/managementGroups/11111111111111111111111111111111111111111"
         ],
         "tenant": [
-            "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f"
+            "/providers/Microsoft.Management/managementGroups/11111111111111111111111111111111111111111"
         ]
     },
     "definitionEntryList": [

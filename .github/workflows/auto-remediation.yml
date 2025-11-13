@@ -24,7 +24,7 @@ on:
       scope:
         description: 'Scope for remediation (management group or subscription ID)'
         required: false
-        default: 'e1f3e196-aa55-4709-9c55-0e334c0b444f'
+        default: '11111111111111111111111111111111111111111'
 
 permissions:
   contents: read
@@ -56,7 +56,7 @@ jobs:
         run: |
           # Get non-compliant resources count
           NON_COMPLIANT=$(az policy state list \
-            --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
+            --management-group "${{ github.event.inputs.scope || '11111111111111111111111111111111111111111' }}" \
             --filter "complianceState eq 'NonCompliant'" \
             --query "length(@)" -o tsv)
 
@@ -93,7 +93,7 @@ jobs:
           # Get all policy assignment IDs for enforcement frameworks
           # Includes: NIST 800-53, MCSB (Microsoft Cloud Security Benchmark), and custom policies
           ASSIGNMENT_IDS=$(az policy assignment list \
-            --scope "/providers/Microsoft.Management/managementGroups/${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
+            --scope "/providers/Microsoft.Management/managementGroups/${{ github.event.inputs.scope || '11111111111111111111111111111111111111111' }}" \
             --query "[?contains(displayName, 'NIST') || contains(displayName, 'Microsoft cloud security benchmark') || contains(displayName, 'MCSB')].{id:id,policyDefinitionId:policyDefinitionId}" -o json)
 
           if [ -z "$ASSIGNMENT_IDS" ] || [ "$ASSIGNMENT_IDS" == "[]" ]; then
@@ -127,7 +127,7 @@ jobs:
               if [[ "$POLICY_DEF_ID" == *"/managementGroups/"* ]]; then
                 echo "This is a custom (management group) policy set"
                 POLICY_SET=$(az policy set-definition show \
-                  --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
+                  --management-group "${{ github.event.inputs.scope || '11111111111111111111111111111111111111111' }}" \
                   --name "$POLICY_SET_NAME" 2>/dev/null || echo "{}")
               else
                 echo "This is a built-in policy set"
@@ -151,7 +151,7 @@ jobs:
                     --name "$TASK_NAME" \
                     --policy-assignment "$ASSIGNMENT_ID" \
                     --definition-reference-id "$REF_ID" \
-                    --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
+                    --management-group "${{ github.event.inputs.scope || '11111111111111111111111111111111111111111' }}" \
                     2>&1 || echo "⚠️  Remediation not applicable for $REF_ID (may be Audit/Deny effect)"
 
                   # Small delay to avoid rate limiting
@@ -167,7 +167,7 @@ jobs:
               az policy remediation create \
                 --name "$TASK_NAME" \
                 --policy-assignment "$ASSIGNMENT_ID" \
-                --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
+                --management-group "${{ github.event.inputs.scope || '11111111111111111111111111111111111111111' }}" \
                 2>&1 || echo "⚠️  Remediation not applicable"
             fi
 
@@ -178,7 +178,7 @@ jobs:
         run: |
           echo "Listing all remediation tasks (NIST, MCSB)..."
           az policy remediation list \
-            --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
+            --management-group "${{ github.event.inputs.scope || '11111111111111111111111111111111111111111' }}" \
             --query "[?contains(name, 'NIST-Remediation') || contains(name, 'MCSB-Remediation')].{Name:name, State:provisioningState, TotalDeployments:deploymentStatus.totalDeployments, SuccessfulDeployments:deploymentStatus.successfulDeployments, FailedDeployments:deploymentStatus.failedDeployments}" \
             -o table
 
@@ -212,14 +212,14 @@ jobs:
           # Get overall compliance
           echo "## Overall Compliance" >> $REPORT_FILE
           az policy state summarize \
-            --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
+            --management-group "${{ github.event.inputs.scope || '11111111111111111111111111111111111111111' }}" \
             -o table >> $REPORT_FILE
 
           # Get non-compliant resources
           echo "" >> $REPORT_FILE
           echo "## Non-Compliant Resources" >> $REPORT_FILE
           az policy state list \
-            --management-group "${{ github.event.inputs.scope || 'e1f3e196-aa55-4709-9c55-0e334c0b444f' }}" \
+            --management-group "${{ github.event.inputs.scope || '11111111111111111111111111111111111111111' }}" \
             --filter "complianceState eq 'NonCompliant'" \
             --query "[].{Resource:resourceId, Policy:policyDefinitionName, Action:policyDefinitionAction}" \
             -o table >> $REPORT_FILE

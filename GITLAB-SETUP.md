@@ -55,8 +55,8 @@ az ad sp create --id $AZURE_CLIENT_ID
 SP_OBJECT_ID=$(az ad sp show --id $AZURE_CLIENT_ID --query id -o tsv)
 
 # Assign required roles at Management Group scope
-# Replace 'e1f3e196-aa55-4709-9c55-0e334c0b444f' with your Management Group ID
-MANAGEMENT_GROUP_ID="e1f3e196-aa55-4709-9c55-0e334c0b444f"
+# Replace '11111111111111111111111111111111111111111' with your Management Group ID
+MANAGEMENT_GROUP_ID="11111111111111111111111111111111111111111"
 
 # Assign roles
 az role assignment create \
@@ -156,7 +156,7 @@ Add the following variables:
 | `AZURE_TENANT_ID` | `<your-tenant-id>` | ✓ | ✓ | Azure AD Tenant ID |
 | `AZURE_CLIENT_ID` | `<your-client-id>` | ✓ | ✓ | Service Principal Application ID |
 | `AZURE_SUBSCRIPTION_ID` | `<your-subscription-id>` | ✓ | ✓ | Azure Subscription ID |
-| `MANAGEMENT_GROUP_ID` | `e1f3e196-aa55-4709-9c55-0e334c0b444f` | ✓ | - | Management Group ID for deployment |
+| `MANAGEMENT_GROUP_ID` | `11111111111111111111111111111111111111111` | ✓ | - | Management Group ID for deployment |
 
 **Important Settings:**
 - **Protected**: Check this box for all variables - they'll only be available in protected branches (main)
@@ -464,7 +464,7 @@ curl --request POST \
 ### Check Azure Policy Compliance
 ```bash
 az policy state list \
-  --management-group "e1f3e196-aa55-4709-9c55-0e334c0b444f" \
+  --management-group "11111111111111111111111111111111111111111" \
   --filter "complianceState eq 'NonCompliant'" \
   --query "length(@)"
 ```

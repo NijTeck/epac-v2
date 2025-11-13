@@ -170,7 +170,7 @@ remediate:check-compliance:
 
     # Check compliance state
     - |
-      MANAGEMENT_GROUP_ID="${MANAGEMENT_GROUP_ID:-e1f3e196-aa55-4709-9c55-0e334c0b444f}"
+      MANAGEMENT_GROUP_ID="${MANAGEMENT_GROUP_ID:-11111111111111111111111111111111111111111}"
 
       NON_COMPLIANT=$(az policy state list \
         --management-group "$MANAGEMENT_GROUP_ID" \
@@ -213,7 +213,7 @@ remediate:create-tasks:
 
     # Create remediation tasks
     - |
-      MANAGEMENT_GROUP_ID="${MANAGEMENT_GROUP_ID:-e1f3e196-aa55-4709-9c55-0e334c0b444f}"
+      MANAGEMENT_GROUP_ID="${MANAGEMENT_GROUP_ID:-11111111111111111111111111111111111111111}"
 
       echo "Creating remediation tasks for NIST 800-53 and MCSB policies..."
 
