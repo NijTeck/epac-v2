@@ -1,8 +1,8 @@
 {
     "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-set-definition-schema.json",
-    "name": "custom-nist-quick-wins",
+    "name": "custom-nist-control-families",
     "properties": {
-        "displayName": "Custom NIST 800-53 Quick Wins Initiative",
+        "displayName": "Custom NIST 800-53 Control Families Initiative",
         "description": "Collection of high-impact custom policies to close NIST 800-53 compliance gaps. Addresses CP-9 (Backup), CM-8/CM-12 (Tagging), CP-6/CP-7 (Geo-Redundancy), SC-5 (DDoS), SI-2 (Update Management), CM-5 (Resource Locks), and SI-10 (WAF).",
         "metadata": {
             "version": "1.0.0",
@@ -10,7 +10,7 @@
             "epac": {
                 "customPolicySet": true,
                 "nistControls": ["CP-9", "CM-8", "CM-12", "CP-2(8)", "CP-6", "CP-7", "SC-5", "SI-2(2)", "CM-5", "SI-10"],
-                "quickWins": true
+                "controlFamilies": ["CP", "CM", "SC", "SI", "RA"]
             }
         },
         "parameters": {
@@ -92,7 +92,7 @@
         "policyDefinitions": [
             {
                 "policyDefinitionReferenceId": "CustomMandatoryTags",
-                "policyDefinitionName": "custom-require-mandatory-tags",
+                "policyDefinitionName": "custom-cm-require-mandatory-tags",
                 "parameters": {
                     "effect": {
                         "value": "[parameters('tagEffect')]"
@@ -102,7 +102,7 @@
             },
             {
                 "policyDefinitionReferenceId": "CustomBackupVMs",
-                "policyDefinitionName": "custom-require-azure-backup-vms",
+                "policyDefinitionName": "custom-cp-require-azure-backup-vms",
                 "parameters": {
                     "effect": {
                         "value": "[parameters('backupEffect')]"

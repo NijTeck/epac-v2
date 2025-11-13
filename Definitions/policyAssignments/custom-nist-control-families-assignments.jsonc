@@ -1,6 +1,6 @@
 {
     "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-assignment-schema.json",
-    "nodeName": "/Custom-Quick-Wins/",
+    "nodeName": "/Custom-Control-Families/",
     "scope": {
         "epac-dev": [
             "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f"
@@ -11,18 +11,18 @@
     },
     "definitionEntryList": [
         {
-            "policySetName": "custom-nist-quick-wins",
-            "displayName": "Custom NIST 800-53 Quick Wins",
+            "policySetName": "custom-nist-control-families",
+            "displayName": "Custom NIST 800-53 Control Families",
             "assignment": {
-                "name": "custom-quick-wins",
-                "displayName": "Custom NIST 800-53 Quick Wins (High-Impact Policies)",
-                "description": "Custom policies addressing critical NIST 800-53 gaps: CP-9 Backup Enforcement, CM-8/CM-12 Mandatory Tagging (Owner, CostCenter, Environment, DataClassification, CriticalityLevel), CP-6/CP-7 Geo-Redundancy, SC-5 DDoS Protection, SI-2(2) Update Management, and SI-10 WAF Enforcement. These quick wins significantly improve compliance coverage.",
+                "name": "custom-ctrl-families",
+                "displayName": "Custom NIST 800-53 Control Families (CP, CM, SC, SI)",
+                "description": "Custom policies addressing critical NIST 800-53 gaps: CP-9 Backup Enforcement, CM-8/CM-12 Mandatory Tagging (Owner, CostCenter, Environment, DataClassification, CriticalityLevel), CP-6/CP-7 Geo-Redundancy, SC-5 DDoS Protection, SI-2(2) Update Management, and SI-10 WAF Enforcement. These control family policies significantly improve compliance coverage.",
                 "metadata": {
                     "version": "1.0.0",
                     "deployedBy": "EPAC",
                     "nistControls": "CP-9, CM-8, CM-12, CP-2(8), CP-6, CP-7, SC-5, SI-2(2), CM-5, SI-10",
-                    "priority": "HIGH",
-                    "quickWins": true
+                    "controlFamilies": "CP, CM, SC, SI, RA",
+                    "priority": "HIGH"
                 },
                 "enforcementMode": "Default",
                 "identity": {
@@ -38,7 +38,7 @@
                 },
                 "nonComplianceMessages": [
                     {
-                        "message": "Resources must comply with Custom NIST 800-53 Quick Wins policies to meet compliance requirements."
+                        "message": "Resources must comply with Custom NIST 800-53 Control Family policies to meet compliance requirements."
                     },
                     {
                         "policyDefinitionReferenceId": "CustomMandatoryTags",

@@ -1,16 +1,16 @@
 {
     "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-definition-schema.json",
-    "name": "custom-require-mandatory-tags",
+    "name": "custom-cm-require-mandatory-tags",
     "properties": {
         "displayName": "Require mandatory tags on resources",
-        "description": "Enforces mandatory tags (Owner, CostCenter, Environment, DataClassification, CriticalityLevel) on all resources. Quick Win custom policy for NIST compliance.",
+        "description": "Enforces mandatory tags (Owner, CostCenter, Environment, DataClassification, CriticalityLevel) on all resources. Control family custom policy for NIST compliance.",
         "metadata": {
             "version": "1.0.0",
             "category": "Tags",
             "epac": {
                 "customPolicy": true,
                 "nistControls": ["CM-8", "CM-12", "CP-2(8)", "RA-9"],
-                "quickWin": true
+                "controlFamily": true
             }
         },
         "mode": "Indexed",

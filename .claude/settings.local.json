@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(where.exe python python3 py)"
+      "Bash(where.exe python python3 py)",
+      "Bash(for file in custom-quick-wins-*.jsonc)",
+      "Bash(do mv \"$file\" \"$file/quick-wins/control-family\")"
     ],
     "deny": [],
     "ask": []
