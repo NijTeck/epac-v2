@@ -1,0 +1,72 @@
+{
+    "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-definition-schema.json",
+    "name": "custom-require-azure-backup-vms",
+    "properties": {
+        "displayName": "Virtual machines should have Azure Backup enabled",
+        "description": "CRITICAL: Ensures Azure Backup is configured on all virtual machines to meet CP-9 (System Backup) requirements. Quick Win custom policy for NIST compliance.",
+        "metadata": {
+            "version": "1.0.0",
+            "category": "Backup",
+            "epac": {
+                "customPolicy": true,
+                "nistControls": ["CP-9", "CP-9(1)", "CP-9(8)"],
+                "priority": "CRITICAL",
+                "quickWin": true
+            }
+        },
+        "mode": "Indexed",
+        "parameters": {
+            "effect": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "Effect",
+                    "description": "Enable or disable the execution of the policy"
+                },
+                "allowedValues": [
+                    "AuditIfNotExists",
+                    "Disabled"
+                ],
+                "defaultValue": "AuditIfNotExists"
+            },
+            "checkBackupHealth": {
+                "type": "Boolean",
+                "metadata": {
+                    "displayName": "Check Backup Health",
+                    "description": "Also check if backup is healthy (not just configured)"
+                },
+                "defaultValue": true
+            }
+        },
+        "policyRule": {
+            "if": {
+                "allOf": [
+                    {
+                        "field": "type",
+                        "equals": "Microsoft.Compute/virtualMachines"
+                    }
+                ]
+            },
+            "then": {
+                "effect": "[parameters('effect')]",
+                "details": {
+                    "type": "Microsoft.RecoveryServices/backupprotecteditems",
+                    "existenceCondition": {
+                        "allOf": [
+                            {
+                                "field": "Microsoft.RecoveryServices/backupprotecteditems/backupManagementType",
+                                "equals": "AzureIaasVM"
+                            },
+                            {
+                                "field": "Microsoft.RecoveryServices/backupprotecteditems/protectionState",
+                                "in": [
+                                    "Protected",
+                                    "ProtectionStopped"
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}

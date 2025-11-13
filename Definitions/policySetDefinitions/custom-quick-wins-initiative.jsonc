@@ -1,0 +1,144 @@
+{
+    "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-set-definition-schema.json",
+    "name": "custom-nist-quick-wins",
+    "properties": {
+        "displayName": "Custom NIST 800-53 Quick Wins Initiative",
+        "description": "Collection of high-impact custom policies to close NIST 800-53 compliance gaps. Addresses CP-9 (Backup), CM-8/CM-12 (Tagging), CP-6/CP-7 (Geo-Redundancy), SC-5 (DDoS), SI-2 (Update Management), CM-5 (Resource Locks), and SI-10 (WAF).",
+        "metadata": {
+            "version": "1.0.0",
+            "category": "Regulatory Compliance",
+            "epac": {
+                "customPolicySet": true,
+                "nistControls": ["CP-9", "CM-8", "CM-12", "CP-2(8)", "CP-6", "CP-7", "SC-5", "SI-2(2)", "CM-5", "SI-10"],
+                "quickWins": true
+            }
+        },
+        "parameters": {
+            "tagEffect": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "Effect for Tagging Policy",
+                    "description": "Enable Audit or Deny for missing mandatory tags"
+                },
+                "allowedValues": [
+                    "Audit",
+                    "Deny",
+                    "Disabled"
+                ],
+                "defaultValue": "Audit"
+            },
+            "backupEffect": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "Effect for Backup Policy",
+                    "description": "Audit if Azure Backup is not configured"
+                },
+                "allowedValues": [
+                    "AuditIfNotExists",
+                    "Disabled"
+                ],
+                "defaultValue": "AuditIfNotExists"
+            },
+            "storageRedundancyEffect": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "Effect for Storage Redundancy",
+                    "description": "Audit or Deny non-geo-redundant storage"
+                },
+                "allowedValues": [
+                    "Audit",
+                    "Deny",
+                    "Disabled"
+                ],
+                "defaultValue": "Audit"
+            },
+            "ddosProtectionEffect": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "Effect for DDoS Protection",
+                    "description": "Audit if DDoS Protection is not enabled"
+                },
+                "allowedValues": [
+                    "AuditIfNotExists",
+                    "Disabled"
+                ],
+                "defaultValue": "AuditIfNotExists"
+            },
+            "updateManagementEffect": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "Effect for Update Management",
+                    "description": "Audit if Update Management is not configured"
+                },
+                "allowedValues": [
+                    "AuditIfNotExists",
+                    "Disabled"
+                ],
+                "defaultValue": "AuditIfNotExists"
+            },
+            "resourceLockEffect": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "Effect for Resource Locks",
+                    "description": "Audit if production resources don't have locks"
+                },
+                "allowedValues": [
+                    "AuditIfNotExists",
+                    "Disabled"
+                ],
+                "defaultValue": "AuditIfNotExists"
+            }
+        },
+        "policyDefinitions": [
+            {
+                "policyDefinitionReferenceId": "CustomMandatoryTags",
+                "policyDefinitionName": "custom-require-mandatory-tags",
+                "parameters": {
+                    "effect": {
+                        "value": "[parameters('tagEffect')]"
+                    }
+                },
+                "groupNames": []
+            },
+            {
+                "policyDefinitionReferenceId": "CustomBackupVMs",
+                "policyDefinitionName": "custom-require-azure-backup-vms",
+                "parameters": {
+                    "effect": {
+                        "value": "[parameters('backupEffect')]"
+                    }
+                },
+                "groupNames": []
+            },
+            {
+                "policyDefinitionReferenceId": "GeoRedundantStorage",
+                "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/b2982f36-99f2-4db5-8eff-283140c09693",
+                "parameters": {
+                    "effect": {
+                        "value": "[parameters('storageRedundancyEffect')]"
+                    }
+                },
+                "groupNames": []
+            },
+            {
+                "policyDefinitionReferenceId": "DDoSProtectionStandard",
+                "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/a7aca53f-2ed4-4466-a25e-0b45ade68efd",
+                "parameters": {},
+                "groupNames": []
+            },
+            {
+                "policyDefinitionReferenceId": "SystemUpdatesInstalled",
+                "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/86b3d65f-7626-441e-b690-81a8b71cff60",
+                "parameters": {},
+                "groupNames": []
+            },
+            {
+                "policyDefinitionReferenceId": "WAFEnabledAppGateway",
+                "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/564feb30-bf6a-4854-b4bb-0d2d2d1e6c66",
+                "parameters": {},
+                "groupNames": []
+            }
+        ],
+        "policyDefinitionGroups": []
+    }
+}

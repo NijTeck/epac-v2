@@ -1,0 +1,71 @@
+{
+    "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-assignment-schema.json",
+    "nodeName": "/Custom-Quick-Wins/",
+    "scope": {
+        "epac-dev": [
+            "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f"
+        ],
+        "tenant": [
+            "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f"
+        ]
+    },
+    "definitionEntryList": [
+        {
+            "policySetName": "custom-nist-quick-wins",
+            "displayName": "Custom NIST 800-53 Quick Wins",
+            "assignment": {
+                "name": "custom-quick-wins",
+                "displayName": "Custom NIST 800-53 Quick Wins (High-Impact Policies)",
+                "description": "Custom policies addressing critical NIST 800-53 gaps: CP-9 Backup Enforcement, CM-8/CM-12 Mandatory Tagging (Owner, CostCenter, Environment, DataClassification, CriticalityLevel), CP-6/CP-7 Geo-Redundancy, SC-5 DDoS Protection, SI-2(2) Update Management, and SI-10 WAF Enforcement. These quick wins significantly improve compliance coverage.",
+                "metadata": {
+                    "version": "1.0.0",
+                    "deployedBy": "EPAC",
+                    "nistControls": "CP-9, CM-8, CM-12, CP-2(8), CP-6, CP-7, SC-5, SI-2(2), CM-5, SI-10",
+                    "priority": "HIGH",
+                    "quickWins": true
+                },
+                "enforcementMode": "Default",
+                "identity": {
+                    "type": "SystemAssigned"
+                },
+                "parameters": {
+                    "tagEffect": "Audit",
+                    "backupEffect": "AuditIfNotExists",
+                    "storageRedundancyEffect": "Audit",
+                    "ddosProtectionEffect": "AuditIfNotExists",
+                    "updateManagementEffect": "AuditIfNotExists",
+                    "resourceLockEffect": "AuditIfNotExists"
+                },
+                "nonComplianceMessages": [
+                    {
+                        "message": "Resources must comply with Custom NIST 800-53 Quick Wins policies to meet compliance requirements."
+                    },
+                    {
+                        "policyDefinitionReferenceId": "CustomMandatoryTags",
+                        "message": "All resources must have mandatory tags: Owner, CostCenter, Environment, DataClassification, and CriticalityLevel. This is required for CM-8, CM-12, CP-2(8), and RA-9 compliance."
+                    },
+                    {
+                        "policyDefinitionReferenceId": "CustomBackupVMs",
+                        "message": "CRITICAL: Virtual machines must have Azure Backup configured to meet CP-9 (System Backup) requirements. Configure backup immediately."
+                    },
+                    {
+                        "policyDefinitionReferenceId": "GeoRedundantStorage",
+                        "message": "Storage accounts must use geo-redundant storage (GRS/GZRS) to meet CP-6 and CP-7 (Alternate Storage/Processing Site) requirements."
+                    },
+                    {
+                        "policyDefinitionReferenceId": "DDoSProtectionStandard",
+                        "message": "Virtual networks with public IPs must have DDoS Protection Standard enabled to meet SC-5 (Denial-of-Service Protection) requirements."
+                    },
+                    {
+                        "policyDefinitionReferenceId": "SystemUpdatesInstalled",
+                        "message": "System updates must be installed to meet SI-2(2) (Automated Flaw Remediation Status) requirements. Enable Update Management or Azure Update Manager."
+                    },
+                    {
+                        "policyDefinitionReferenceId": "WAFEnabledAppGateway",
+                        "message": "Application Gateways must have WAF enabled to meet SI-10 (Information Input Validation) requirements and protect against OWASP Top 10 vulnerabilities."
+                    }
+                ]
+            }
+        }
+    ]
+}

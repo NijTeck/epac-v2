@@ -1,0 +1,102 @@
+{
+    "$schema": "https://raw.githubusercontent.com/Azure/enterprise-azure-policy-as-code/main/Schemas/policy-definition-schema.json",
+    "name": "custom-require-mandatory-tags",
+    "properties": {
+        "displayName": "Require mandatory tags on resources",
+        "description": "Enforces mandatory tags (Owner, CostCenter, Environment, DataClassification, CriticalityLevel) on all resources. Quick Win custom policy for NIST compliance.",
+        "metadata": {
+            "version": "1.0.0",
+            "category": "Tags",
+            "epac": {
+                "customPolicy": true,
+                "nistControls": ["CM-8", "CM-12", "CP-2(8)", "RA-9"],
+                "quickWin": true
+            }
+        },
+        "mode": "Indexed",
+        "parameters": {
+            "effect": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "Effect",
+                    "description": "Enable or disable the execution of the policy"
+                },
+                "allowedValues": [
+                    "Audit",
+                    "Deny",
+                    "Disabled"
+                ],
+                "defaultValue": "Audit"
+            },
+            "ownerTagName": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "Owner Tag Name",
+                    "description": "Name of the Owner tag"
+                },
+                "defaultValue": "Owner"
+            },
+            "costCenterTagName": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "Cost Center Tag Name",
+                    "description": "Name of the Cost Center tag"
+                },
+                "defaultValue": "CostCenter"
+            },
+            "environmentTagName": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "Environment Tag Name",
+                    "description": "Name of the Environment tag"
+                },
+                "defaultValue": "Environment"
+            },
+            "dataClassificationTagName": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "Data Classification Tag Name",
+                    "description": "Name of the Data Classification tag"
+                },
+                "defaultValue": "DataClassification"
+            },
+            "criticalityLevelTagName": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "Criticality Level Tag Name",
+                    "description": "Name of the Criticality Level tag"
+                },
+                "defaultValue": "CriticalityLevel"
+            }
+        },
+        "policyRule": {
+            "if": {
+                "anyOf": [
+                    {
+                        "field": "[concat('tags[', parameters('ownerTagName'), ']')]",
+                        "exists": "false"
+                    },
+                    {
+                        "field": "[concat('tags[', parameters('costCenterTagName'), ']')]",
+                        "exists": "false"
+                    },
+                    {
+                        "field": "[concat('tags[', parameters('environmentTagName'), ']')]",
+                        "exists": "false"
+                    },
+                    {
+                        "field": "[concat('tags[', parameters('dataClassificationTagName'), ']')]",
+                        "exists": "false"
+                    },
+                    {
+                        "field": "[concat('tags[', parameters('criticalityLevelTagName'), ']')]",
+                        "exists": "false"
+                    }
+                ]
+            },
+            "then": {
+                "effect": "[parameters('effect')]"
+            }
+        }
+    }
+}
