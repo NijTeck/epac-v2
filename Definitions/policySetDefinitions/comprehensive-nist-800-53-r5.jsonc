@@ -235,11 +235,11 @@
       // },
       
       // ============================================================
-      // CM - Configuration Management (Custom STIG Policies)
+      // CM - Configuration Management (Custom STIG Policies - CAT I & CAT II)
       // ============================================================
       {
-        "policyDefinitionReferenceId": "CM-WindowsSTIGCompliance",
-        "policyDefinitionId": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f/providers/Microsoft.Authorization/policyDefinitions/custom-cm-windows-stig-compliance",
+        "policyDefinitionReferenceId": "CM-WindowsSTIGComplianceCAT1",
+        "policyDefinitionId": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f/providers/Microsoft.Authorization/policyDefinitions/custom-cm-windows-stig-cat1",
         "parameters": {
           "IncludeArcMachines": {
             "value": "[parameters('includeArcMachinesForStig')]"
@@ -255,8 +255,42 @@
         ]
       },
       {
-        "policyDefinitionReferenceId": "CM-LinuxSTIGCompliance",
-        "policyDefinitionId": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f/providers/Microsoft.Authorization/policyDefinitions/custom-cm-linux-stig-compliance",
+        "policyDefinitionReferenceId": "CM-WindowsSTIGComplianceCAT2",
+        "policyDefinitionId": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f/providers/Microsoft.Authorization/policyDefinitions/custom-cm-windows-stig-cat2",
+        "parameters": {
+          "IncludeArcMachines": {
+            "value": "[parameters('includeArcMachinesForStig')]"
+          },
+          "effect": {
+            "value": "AuditIfNotExists"
+          }
+        },
+        "groupNames": [
+          "NIST_SP_800-53_R5_CM-6",
+          "NIST_SP_800-53_R5_CM-2",
+          "NIST_SP_800-53_R5_CM-7"
+        ]
+      },
+      {
+        "policyDefinitionReferenceId": "CM-LinuxSTIGComplianceCAT1",
+        "policyDefinitionId": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f/providers/Microsoft.Authorization/policyDefinitions/custom-cm-linux-stig-cat1",
+        "parameters": {
+          "IncludeArcMachines": {
+            "value": "[parameters('includeArcMachinesForStig')]"
+          },
+          "effect": {
+            "value": "AuditIfNotExists"
+          }
+        },
+        "groupNames": [
+          "NIST_SP_800-53_R5_CM-6",
+          "NIST_SP_800-53_R5_CM-2",
+          "NIST_SP_800-53_R5_CM-7"
+        ]
+      },
+      {
+        "policyDefinitionReferenceId": "CM-LinuxSTIGComplianceCAT2",
+        "policyDefinitionId": "/providers/Microsoft.Management/managementGroups/e1f3e196-aa55-4709-9c55-0e334c0b444f/providers/Microsoft.Authorization/policyDefinitions/custom-cm-linux-stig-cat2",
         "parameters": {
           "IncludeArcMachines": {
             "value": "[parameters('includeArcMachinesForStig')]"
