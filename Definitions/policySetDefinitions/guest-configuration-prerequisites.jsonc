@@ -17,12 +17,12 @@
       },
       {
         "policyDefinitionReferenceId": "DeployWindowsGCExtension",
-        "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policyDefinitions/deploy-windows-gc-extension",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/385f5831-96d4-41db-9a3c-cd3af78aaae6",
         "parameters": {}
       },
       {
         "policyDefinitionReferenceId": "DeployLinuxGCExtension",
-        "policyDefinitionId": "${root_scope_resource_id}/providers/Microsoft.Authorization/policyDefinitions/deploy-linux-gc-extension",
+        "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/331e8ea8-378a-410f-a2e5-ae22f38bb0da",
         "parameters": {}
       }
     ]
