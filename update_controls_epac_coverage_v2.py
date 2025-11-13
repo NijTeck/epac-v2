@@ -835,14 +835,14 @@ def update_excel_file(file_path):
             ["4. SC-5: Enforce DDoS Protection", "HIGH - Require on public IPs/VNETs"],
             ["5. SI-2(2): Enforce Update Management", "HIGH - All VMs must enroll"],
             ["", ""],
-            ["Quick Wins (Custom Policies)", ""],
-            ["• Mandatory Tags: Owner, CostCenter, Environment, DataClassification, CriticalityLevel", ""],
-            ["• Backup Enforcement: Azure Backup required on all VMs and SQL databases", ""],
-            ["• Geo-Redundancy: Require GRS/GZRS storage, multi-region for critical apps", ""],
-            ["• DDoS Protection: Require Standard tier on public-facing resources", ""],
-            ["• Update Management: Require enrollment on all compute resources", ""],
-            ["• Resource Locks: Require locks on production resource groups", ""],
-            ["• WAF Enforcement: Require Application Gateway WAF on public web apps", ""],
+            ["Custom Control Family Policies", ""],
+            ["• CM Family - Mandatory Tags: Owner, CostCenter, Environment, DataClassification, CriticalityLevel", ""],
+            ["• CP Family - Backup Enforcement: Azure Backup required on all VMs and SQL databases", ""],
+            ["• CP Family - Geo-Redundancy: Require GRS/GZRS storage, multi-region for critical apps", ""],
+            ["• SC Family - DDoS Protection: Require Standard tier on public-facing resources", ""],
+            ["• SI Family - Update Management: Require enrollment on all compute resources", ""],
+            ["• CM Family - Resource Locks: Require locks on production resource groups", ""],
+            ["• SI Family - WAF Enforcement: Require Application Gateway WAF on public web apps", ""],
         ]
 
         for row_idx, row_data in enumerate(summary_data, start=1):
@@ -851,7 +851,7 @@ def update_excel_file(file_path):
                 cell.value = value
                 if row_idx == 1:
                     cell.font = Font(bold=True, size=16, color="0066CC")
-                elif row_data[0] in ["Overall Statistics", "Custom Policy Opportunities", "Priority Actions", "Quick Wins (Custom Policies)"]:
+                elif row_data[0] in ["Overall Statistics", "Custom Policy Opportunities", "Priority Actions", "Custom Control Family Policies"]:
                     cell.font = Font(bold=True, size=12)
                 elif "CRITICAL" in str(value):
                     cell.font = Font(bold=True, color="9C0006")
